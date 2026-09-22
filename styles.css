@@ -48,6 +48,14 @@ h2 {
   margin: 1.5em auto;
 }
 
+.tutorial-figure {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  margin: 1.4em auto 0.8em;
+}
+
 .note,
 .warning {
   border-left: 4px solid #2d7896;
@@ -68,4 +76,3 @@ table {
 pre {
   border-radius: 4px;
 }
-

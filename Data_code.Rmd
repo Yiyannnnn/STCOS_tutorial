@@ -8,6 +8,12 @@ transcriptomics dataset. The current release treats the reference as one
 global spot-level profile (`CT`) and does not infer separate cell-type-specific
 dependence matrices.
 
+The worked output below uses human dorsolateral prefrontal cortex (DLPFC)
+section 151673. The reference and simulation contain the same 3,611 annotated
+spots; ST-COS estimates the negative-binomial marginals, spatial mean fields,
+and global latent dependence structure from the observed section before
+generating a new realization.
+
 ## 1. Prepare the inputs
 
 `expr` must contain genes in rows and spots in columns. `spatial_coord` must
@@ -88,6 +94,20 @@ This output is a newly generated realization from the fitted marginal,
 spatial, and latent dependence parameters. It is not a resampled copy of the
 observed count matrix.
 
+### Example output: DLPFC section 151673
+
+The panels use a common color range within each gene and compare the observed
+section with one fitted ST-COS replay. SLC17A7 and PCP4 show cortical
+expression patterns, while MOBP marks white matter.
+
+<img src="assets/dlpfc-reference-output.png"
+     alt="Observed and ST-COS simulated spatial expression for SLC17A7, PCP4, and MOBP in DLPFC section 151673"
+     class="tutorial-figure">
+
+The plotted output was generated from the same matched spot identifiers used
+for model fitting. A complete analysis can use the full retained gene panel;
+the three genes shown here keep the tutorial output readable.
+
 ## 4. Create a spatial counterfactual
 
 Because fitted parameters are explicit, a selected spatial mean can be edited
@@ -162,6 +182,3 @@ A global correlation matrix estimated from heterogeneous spots can contain
 composition-driven association. Do not interpret it automatically as
 within-cell-type co-regulation.
 </div>
-
-See [Interpretation and limitations](Shiny_tutorial.html) before using
-count-scale correlations as benchmark truth.

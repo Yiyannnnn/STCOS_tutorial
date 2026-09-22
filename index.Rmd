@@ -18,7 +18,6 @@ latent gene-gene dependence.
 | Design cell types, spatial patterns, and gene modules from scratch | [Reference-free tutorial](Example.html) |
 | Fit a model to an observed spatial transcriptomics dataset | [Reference-based tutorial](Data_code.html) |
 | Install the package and check input dimensions | [Installation and inputs](Rpackage.html) |
-| Understand latent correlation, count-scale attenuation, and spot mixing | [Interpretation and limitations](Shiny_tutorial.html) |
 
 ## What ST-COS controls
 

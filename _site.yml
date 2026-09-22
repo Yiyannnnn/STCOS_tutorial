@@ -13,8 +13,6 @@ navbar:
       href: Example.html
     - text: "Reference-based"
       href: Data_code.html
-    - text: "Interpretation"
-      href: Shiny_tutorial.html
   right:
     - text: "GitHub"
       href: https://github.com/Yiyannnnn/ST-COS

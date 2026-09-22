@@ -262,9 +262,6 @@ $(document).ready(function () {
 <li>
   <a href="Data_code.html">Reference-based</a>
 </li>
-<li>
-  <a href="Shiny_tutorial.html">Interpretation</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -295,7 +292,10 @@ $(document).ready(function () {
 <ul>
 <li><a href="#prepare-the-inputs">1. Prepare the inputs</a></li>
 <li><a href="#estimate-reference-parameters">2. Estimate reference parameters</a></li>
-<li><a href="#generate-a-fitted-replay">3. Generate a fitted replay</a></li>
+<li><a href="#generate-a-fitted-replay">3. Generate a fitted replay</a>
+<ul>
+<li><a href="#example-output-dlpfc-section-151673">Example output: DLPFC section 151673</a></li>
+</ul></li>
 <li><a href="#create-a-spatial-counterfactual">4. Create a spatial counterfactual</a></li>
 <li><a href="#rewire-a-selected-dependence-block">5. Rewire a selected dependence block</a></li>
 <li><a href="#practical-guidance">6. Practical guidance</a></li>
@@ -303,6 +303,7 @@ $(document).ready(function () {
 </div>
 
 <p>Reference-based mode estimates simulation parameters from an observed spatial transcriptomics dataset. The current release treats the reference as one global spot-level profile (<code>CT</code>) and does not infer separate cell-type-specific dependence matrices.</p>
+<p>The worked output below uses human dorsolateral prefrontal cortex (DLPFC) section 151673. The reference and simulation contain the same 3,611 annotated spots; ST-COS estimates the negative-binomial marginals, spatial mean fields, and global latent dependence structure from the observed section before generating a new realization.</p>
 <div id="prepare-the-inputs" class="section level2">
 <h2>1. Prepare the inputs</h2>
 <p><code>expr</code> must contain genes in rows and spots in columns. <code>spatial_coord</code> must contain the same spots in the same order, with columns named <code>row</code> and <code>col</code>.</p>
@@ -362,6 +363,14 @@ replay &lt;- generate_true_count(
 
 simulated_counts &lt;- replay$CT # spots x genes</code></pre>
 <p>This output is a newly generated realization from the fitted marginal, spatial, and latent dependence parameters. It is not a resampled copy of the observed count matrix.</p>
+<div id="example-output-dlpfc-section-151673" class="section level3">
+<h3>Example output: DLPFC section 151673</h3>
+<p>The panels use a common color range within each gene and compare the observed section with one fitted ST-COS replay. SLC17A7 and PCP4 show cortical expression patterns, while MOBP marks white matter.</p>
+<p><img src="assets/dlpfc-reference-output.png"
+     alt="Observed and ST-COS simulated spatial expression for SLC17A7, PCP4, and MOBP in DLPFC section 151673"
+     class="tutorial-figure"></p>
+<p>The plotted output was generated from the same matched spot identifiers used for model fitting. A complete analysis can use the full retained gene panel; the three genes shown here keep the tutorial output readable.</p>
+</div>
 </div>
 <div id="create-a-spatial-counterfactual" class="section level2">
 <h2>4. Create a spatial counterfactual</h2>
@@ -418,7 +427,6 @@ dependence_counterfactual &lt;- generate_true_count(
 <div class="warning">
 <p>A global correlation matrix estimated from heterogeneous spots can contain composition-driven association. Do not interpret it automatically as within-cell-type co-regulation.</p>
 </div>
-<p>See <a href="Shiny_tutorial.html">Interpretation and limitations</a> before using count-scale correlations as benchmark truth.</p>
 </div>
 
 

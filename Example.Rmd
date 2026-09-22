@@ -8,62 +8,129 @@ knitr::opts_chunk$set(
   echo = TRUE,
   message = FALSE,
   warning = FALSE,
-  fig.width = 8,
-  fig.height = 4.5
+  fig.width = 9,
+  fig.height = 4.8
 )
 library(STCOS)
 ```
 
-This tutorial builds a small simulation with two cell types, four genes,
-cell-type-specific spatial patterns, and one dependence block per cell type.
+This example builds a reference-free tissue with three cell types, 150 genes,
+and 492 hexagonally arranged spots. It combines hotspots, streaks, layers,
+cell-type-specific gene modules, and spatially varying cell-type composition.
 Only ST-COS and base R are required.
 
-## 1. Generate coordinates
+## 1. Define genes and spatial patterns
 
-```{r coordinates}
+The first 50 genes carry designed spatial signal and the remaining 100 genes
+have spatially constant means. The pattern assigned to each gene can differ by
+cell type.
+
+```{r parameters}
 set.seed(1)
 
-coord <- generate_coordinates(
-  x_len = 10,
-  y_len = 10,
-  pattern = "grid",
-  spot_distance = 1
-)
-rownames(coord) <- paste0("spot_", seq_len(nrow(coord)))
-
-dim(coord)
-head(coord)
-```
-
-`pattern` can be `"grid"`, `"hex"`, or `"random"`. For random coordinates,
-provide `n_spot` instead of `spot_distance`.
-
-## 2. Specify spatial mean patterns
-
-Rows of `gene_pattern` are genes and columns are cell types. Available labels
-are `"hotspot"`, `"streak"`, `"layer"`, and `"no_pattern"`.
-
-```{r mean-patterns}
-genes <- paste0("gene_", 1:4)
+n_genes <- 150
+genes <- paste0("gene", seq_len(n_genes))
+cell_types <- c("ct1", "ct2", "ct3")
 
 gene_pattern <- data.frame(
-  Excitatory = c("hotspot", "hotspot", "no_pattern", "no_pattern"),
-  Inhibitory = c("no_pattern", "no_pattern", "streak", "streak"),
+  ct1 = c(rep("hotspot", 10), rep("streak", 10),
+          rep("no_pattern", 130)),
+  ct2 = c(rep("no_pattern", 10), rep("streak", 10),
+          rep("hotspot", 10), rep("no_pattern", 120)),
+  ct3 = c(rep("no_pattern", 30), rep("hotspot", 10),
+          rep("layer", 10), rep("no_pattern", 100)),
   row.names = genes
 )
 
+gene_relationship <- data.frame(
+  ct1 = c(rep(NA, 10), rep(1, 3), rep(2, 3), rep(3, 4), rep(NA, 130)),
+  ct2 = c(rep(NA, 10), rep(1, 3), rep(2, 3), rep(3, 4), rep(NA, 130)),
+  ct3 = c(rep(NA, 40), rep(1, 10), rep(NA, 100)),
+  row.names = genes
+)
+
+hotspot_centers <- list(
+  ct1 = data.frame(
+    x_coord = rep(25, 10),
+    y_coord = c(rep(25, 3), rep(50, 4), rep(75, 3))
+  ),
+  ct2 = data.frame(
+    x_coord = c(rep(25, 4), rep(75, 6)),
+    y_coord = c(rep(75, 7), rep(25, 3))
+  ),
+  ct3 = data.frame(
+    x_coord = c(rep(25, 3), rep(50, 4), rep(75, 3)),
+    y_coord = rep(75, 10)
+  )
+)
+```
+
+`gene_relationship` defines three dependence blocks for the streak genes in
+`ct1` and `ct2`, and one block for the layer genes in `ct3`. An `NA` leaves a
+gene outside the explicitly correlated blocks.
+
+## 2. Generate coordinates and layers
+
+```{r coordinates}
+coord <- generate_coordinates(
+  x_len = 100,
+  y_len = 100,
+  pattern = "hex",
+  spot_distance = 5
+)
+rownames(coord) <- paste0("spot_", seq_len(nrow(coord)))
+
+layer_coord <- generate_layer(
+  coord,
+  xmin = c(0, 0, 50, 50),
+  xmax = c(50, 50, 100, 100),
+  ymin = c(0, 50, 0, 50),
+  ymax = c(50, 100, 50, 100)
+)
+
+coord_key <- paste(coord$x_coord, coord$y_coord)
+layer_key <- paste(layer_coord$x_coord, layer_coord$y_coord)
+layer_coord <- layer_coord[match(coord_key, layer_key), ]
+rownames(layer_coord) <- rownames(coord)
+
+cat(sprintf(
+  "%d spots, %d genes, %d cell types\n",
+  nrow(coord), n_genes, length(cell_types)
+))
+```
+
+## 3. Generate cell-type-specific mean fields
+
+```{r mean-fields}
 mean_param <- generate_gene_pattern(
   coord = coord,
   gene_pattern = gene_pattern,
-  seed = 1
+  center_coord = hotspot_centers,
+  layer_assignments = layer_coord$layer,
+  layer_param = c(20, 55, 90, 130),
+  seed = 123
 )
 
-lapply(mean_param, dim)
-```
+# Preserve the separated streak positions used in the original example.
+streak_centers <- list(
+  ct1 = c(rep(10, 3), rep(20, 3), rep(30, 4)),
+  ct2 = c(rep(60, 3), rep(70, 3), rep(80, 4))
+)
 
-Each element of `mean_param` is a spot-by-gene mean matrix. The optional
-pattern arguments let users set hotspot centers and radii, streak positions
-and widths, or per-layer means.
+for (cell_type in names(streak_centers)) {
+  streak_genes <- which(gene_pattern[[cell_type]] == "streak")
+  for (i in seq_along(streak_genes)) {
+    mean_param[[cell_type]][, streak_genes[i]] <- generate_pattern(
+      coord = coord,
+      pattern = "streak",
+      streak_x = streak_centers[[cell_type]][i],
+      streak_x_param = 90,
+      background_param = 20,
+      streak_size = 18
+    )
+  }
+}
+```
 
 ```{r plot-means}
 plot_field <- function(values, title) {
@@ -76,123 +143,126 @@ plot_field <- function(values, title) {
   )
 }
 
-par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
-plot_field(mean_param$Excitatory[, "gene_1"], "Excitatory: gene_1")
-plot_field(mean_param$Inhibitory[, "gene_3"], "Inhibitory: gene_3")
+par(mfrow = c(1, 3), mar = c(4, 4, 3, 1))
+plot_field(mean_param$ct1[, "gene1"], "ct1: hotspot")
+plot_field(mean_param$ct2[, "gene11"], "ct2: streak")
+plot_field(mean_param$ct3[, "gene45"], "ct3: layer")
 ```
 
-## 3. Specify latent gene dependence
+## 4. Generate cell-type-specific expression
 
-`gene_relationship` identifies the genes included in each dependence block.
-`NA` marks genes simulated independently in that cell type.
+```{r expression}
+set.seed(124)
+cov_gene <- generate_covariance_group(gene_relationship)
 
-```{r dependence}
-gene_relationship <- data.frame(
-  Excitatory = c(1, 1, NA, NA),
-  Inhibitory = c(NA, NA, 1, 1),
-  row.names = genes
-)
-
-rho <- array(
-  0,
-  dim = c(4, 4, 2),
-  dimnames = list(genes, genes, c("Excitatory", "Inhibitory"))
-)
-diag(rho[, , "Excitatory"]) <- 1
-diag(rho[, , "Inhibitory"]) <- 1
-
-rho[1, 2, "Excitatory"] <- rho[2, 1, "Excitatory"] <- 0.6
-rho[3, 4, "Inhibitory"] <- rho[4, 3, "Inhibitory"] <- 0.6
-```
-
-The value `0.6` is a **latent Gaussian correlation**, not a guarantee that the
-final count-scale Pearson correlation will equal 0.6.
-
-## 4. Generate cell-type-specific profiles
-
-```{r cell-type-profiles}
 cell_type_profiles <- generate_true_count(
   coord = coord,
   mean_param = mean_param,
   gene_relationship = gene_relationship,
-  cov_gene = rho,
-  theta_g = list(
-    Excitatory = rep(10, length(genes)),
-    Inhibitory = rep(10, length(genes))
+  cov_gene = cov_gene,
+  theta_g = setNames(
+    rep(list(rep(10, n_genes)), length(cell_types)),
+    cell_types
   ),
   eigen_floor = 1e-6
 )
 
-lapply(cell_type_profiles, dim)
-cell_type_profiles$Excitatory[1:4, ]
+cat(
+  sprintf(
+    "%s: %d spots x %d genes",
+    names(cell_type_profiles),
+    vapply(cell_type_profiles, nrow, integer(1)),
+    vapply(cell_type_profiles, ncol, integer(1))
+  ),
+  sep = "\n"
+)
 ```
 
-Larger negative-binomial size values imply lower overdispersion at a fixed
-mean. A separate value can be supplied for every gene and cell type.
+The covariance arrays define latent Gaussian dependence. Realized Pearson and
+Spearman correlations in the generated counts can be lower because the
+negative-binomial inverse CDF is discrete and gene marginals differ.
 
-## 5. Define cell-type composition
+## 5. Define spatial cell-type composition
 
-Here, excitatory abundance increases smoothly from left to right.
+Each quadrant has a different expected composition. Small random variation is
+added within each layer, and every row is normalized to sum to one.
 
 ```{r composition}
-p_excitatory <- plogis((coord$x_coord - 5) / 1.5)
-celltype_proportion <- cbind(
-  Excitatory = p_excitatory,
-  Inhibitory = 1 - p_excitatory
+composition_by_layer <- data.frame(
+  ct1 = c(1, 1 / 3, 0, 0),
+  ct2 = c(0, 1 / 3, 1 / 2, 4 / 5),
+  ct3 = c(0, 1 / 3, 1 / 2, 1 / 5)
+)
+
+celltype_proportion <- generate_cell_prop(
+  layer_coord = layer_coord,
+  layer_param = composition_by_layer
 )
 rownames(celltype_proportion) <- rownames(coord)
 
+round(head(celltype_proportion), 3)
 range(rowSums(celltype_proportion))
-head(celltype_proportion)
 ```
 
 ```{r plot-composition}
-par(mfrow = c(1, 1), mar = c(4, 4, 3, 1))
-plot_field(celltype_proportion[, "Excitatory"], "Excitatory proportion")
+par(mfrow = c(1, 3), mar = c(4, 4, 3, 1))
+for (cell_type in cell_types) {
+  plot_field(
+    celltype_proportion[, cell_type],
+    paste(cell_type, "proportion")
+  )
+}
 ```
 
-## 6. Construct spot-level expression
+## 6. Construct the spot-level expression matrix
 
 ```{r spot-expression}
 spot_expression <- generate_spot_count(
   true_count = cell_type_profiles,
-  nGenes = length(genes),
-  cell_number = 8,
+  nGenes = n_genes,
+  cell_number = 10,
   celltype_proportion = celltype_proportion
 )
 
 dim(spot_expression)
-spot_expression[1:4, ]
+spot_expression[1:4, 1:6]
 ```
 
-The rows are spots and the columns are genes. `cell_number` is interpreted as
-the total cell-equivalent abundance. Because the construction is a continuous
-abundance-weighted mixture, the resulting spot values need not be integers.
+Rows are spots and columns are genes. `cell_number` is the total
+cell-equivalent abundance used by the abundance-weighted spot mixture, so the
+resulting values need not be integers.
 
-## 7. Inspect the requested and realized dependence
+## 7. Inspect the dependence structure
 
-```{r inspect-correlation}
-requested <- rho[, , "Excitatory"]
-realized_pearson <- cor(cell_type_profiles$Excitatory, method = "pearson")
-realized_spearman <- cor(cell_type_profiles$Excitatory, method = "spearman")
+```{r correlations}
+plot_correlation <- function(x, title) {
+  correlation <- cor(x[, 1:50], method = "spearman")
+  image(
+    seq_len(ncol(correlation)), seq_len(nrow(correlation)),
+    t(correlation[nrow(correlation):1, ]),
+    col = hcl.colors(101, "Blue-Red 3"), zlim = c(-1, 1),
+    axes = FALSE, xlab = "Genes 1-50", ylab = "Genes 1-50",
+    main = title
+  )
+  box()
+}
 
-round(c(
-  latent = requested[1, 2],
-  count_pearson = realized_pearson[1, 2],
-  count_spearman = realized_spearman[1, 2]
-), 3)
+par(mfrow = c(2, 2), mar = c(3, 3, 3, 1))
+plot_correlation(cell_type_profiles$ct1, "ct1")
+plot_correlation(cell_type_profiles$ct2, "ct2")
+plot_correlation(cell_type_profiles$ct3, "ct3")
+plot_correlation(spot_expression, "Spot mixture")
 ```
 
-Differences between the requested latent value and count-scale estimates are
-expected. They depend on the means, dispersions, zero frequencies, spatial
-mean patterns, and aggregation.
+## Adapt the design
 
-## Customize the scenario
-
-- Change `gene_pattern` to move spatial signal among genes or cell types.
-- Edit one block of `rho` to create a controlled dependence intervention.
-- Replace `celltype_proportion` with an externally generated abundance field.
-- Pass a vector to `cell_number` to vary total abundance by spot.
+- Edit `gene_pattern` to move a hotspot, streak, or layer signal to another
+  cell type.
+- Edit one block of `gene_relationship` or `cov_gene` to create a controlled
+  co-expression intervention.
+- Replace `composition_by_layer` with another designed or externally supplied
+  abundance field.
+- Pass a vector to `cell_number` to vary total abundance among spots.
 - Use `generate_batch_count()` to add dropout and sequencing-depth effects.
 
 For fitted simulations, continue to the
