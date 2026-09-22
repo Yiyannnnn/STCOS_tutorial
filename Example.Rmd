@@ -22,8 +22,10 @@ Only ST-COS and base R are required.
 <div class="note">
 For image-derived layouts, open the
 <a href="https://yiyanz.shinyapps.io/st-cos/">image-guided Shiny app</a>
-directly or run <code>launch_stcos_app()</code> from R. The app accepts a
-histology image, an externally segmented mask, or an uploaded coordinate file.
+directly. To design coordinates locally from R, run
+<code>shiny::runApp(stcos_shiny_app())</code>. The interfaces accept a
+histology image or an uploaded coordinate file; the hosted version also
+provides image segmentation and full simulation controls.
 </div>
 
 ## 1. Define genes and spatial patterns

@@ -22,11 +22,20 @@ packageVersion("STCOS")
 The package imports `data.table`, `expm`, `mgcv`, and `spdep`. Installing with
 `devtools::install_github()` installs missing CRAN dependencies automatically.
 
-## Launch the image-guided application
+## Run the image-guided application
 
-The hosted Shiny application accepts histology images or coordinate files and
-provides interactive controls for spatial layout, regions, gene patterns,
-cell-type composition, and gene-dependence groups.
+`stcos_shiny_app()` builds a local application using
+`shiny::shinyApp(ui, server)`. It accepts histology images, coordinate files,
+image clicks, and generated layouts, and exports the designed coordinates for
+reference-free simulation.
+
+```{r local-app, eval=FALSE}
+app <- stcos_shiny_app()
+shiny::runApp(app)
+```
+
+The hosted application additionally provides image segmentation, region
+selection, gene patterns, cell-type composition, and gene-dependence controls.
 
 ```{r launch-app, eval=FALSE}
 launch_stcos_app()
@@ -66,6 +75,7 @@ Cell-type names must agree across `mean_param`, `theta_g`,
 | `generate_spot_count()` | Construct abundance-weighted spot profiles |
 | `generate_batch_count()` | Apply dropout and sequencing-depth effects |
 | `get_real_param()` | Estimate reference-based parameters |
+| `stcos_shiny_app()` | Build the local image-guided Shiny application |
 | `launch_stcos_app()` | Open the hosted image-guided interface |
 
 Use `?function_name` in R for argument-level documentation, for example:

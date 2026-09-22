@@ -54,7 +54,8 @@ change to a spatial or dependence parameter.
 The [ST-COS Shiny app](https://yiyanz.shinyapps.io/st-cos/) extends the
 reference-free workflow with histology-image upload and segmentation,
 externally supplied coordinates, and interactive spatial-region controls. It
-can also be opened from R with `launch_stcos_app()`.
+can be opened from R with `launch_stcos_app()`. A local image-coordinate
+designer is available through `shiny::runApp(stcos_shiny_app())`.
 
 ### Reference-based
 
