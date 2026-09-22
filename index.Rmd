@@ -1,8 +1,47 @@
 ---
-title: "About"
+title: "ST-COS Tutorial"
 output: html_document
 ---
 
-### Simulator Introduction
+<p class="lead-copy">
+ST-COS simulates spatial transcriptomics data with configurable spatial gene
+patterns, cell-type composition, negative-binomial marginals, and explicit
+latent gene-gene dependence.
+</p>
 
-### Workflow (Fig?)
+<img class="workflow-image" src="assets/workflow.png" alt="ST-COS reference-free and reference-based workflows">
+
+## Choose a workflow
+
+| Goal | Start here |
+| --- | --- |
+| Design cell types, spatial patterns, and gene modules from scratch | [Reference-free tutorial](Example.html) |
+| Fit a model to an observed spatial transcriptomics dataset | [Reference-based tutorial](Data_code.html) |
+| Install the package and check input dimensions | [Installation and inputs](Rpackage.html) |
+| Understand latent correlation, count-scale attenuation, and spot mixing | [Interpretation and limitations](Shiny_tutorial.html) |
+
+## What ST-COS controls
+
+ST-COS separates five parts of a simulation:
+
+1. Spatial coordinates and cell-type abundance fields.
+2. Cell-type-specific spatial mean expression.
+3. Gene-specific negative-binomial marginals.
+4. Latent Gaussian pairwise dependence among selected genes.
+5. Abundance-weighted construction of spot-level profiles.
+
+This separation lets users change one component while holding the others
+fixed, which is useful for controlled benchmark scenarios and counterfactual
+experiments.
+
+<div class="note">
+The specified correlation matrix is a latent Gaussian target. Pearson and
+Spearman correlations measured from the final counts can be smaller because
+of discretization, sparsity, and spot-level mixing.
+</div>
+
+## Package and source
+
+- [ST-COS package](https://github.com/Yiyannnnn/ST-COS)
+- [Tutorial source](https://github.com/Yiyannnnn/STCOS_tutorial)
+- [Issue tracker](https://github.com/Yiyannnnn/ST-COS/issues)

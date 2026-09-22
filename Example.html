@@ -11,12 +11,12 @@
 
 
 
-<title>Example</title>
+<title>Reference-free Simulation</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -30,6 +30,9 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -40,113 +43,23 @@
   ul.task-list{list-style: none;}
     </style>
 
-
-
-<style type="text/css">
-  code {
-    white-space: pre;
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
   }
-  .sourceCode {
-    overflow: visible;
-  }
-</style>
-<style type="text/css" data-origin="pandoc">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
 }
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  background-color: #f8f8f8; }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ef2929; } /* Alert */
-code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #204a87; } /* Attribute */
-code span.bn { color: #0000cf; } /* BaseN */
-code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4e9a06; } /* Char */
-code span.cn { color: #8f5902; } /* Constant */
-code span.co { color: #8f5902; font-style: italic; } /* Comment */
-code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
-code span.dt { color: #204a87; } /* DataType */
-code span.dv { color: #0000cf; } /* DecVal */
-code span.er { color: #a40000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #0000cf; } /* Float */
-code span.fu { color: #204a87; font-weight: bold; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
-code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
-code span.ot { color: #8f5902; } /* Other */
-code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
-code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
-code span.ss { color: #4e9a06; } /* SpecialString */
-code span.st { color: #4e9a06; } /* String */
-code span.va { color: #000000; } /* Variable */
-code span.vs { color: #4e9a06; } /* VerbatimString */
-code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
-
-</style>
-<script>
-// apply pandoc div.sourceCode style to pre.sourceCode instead
-(function() {
-  var sheets = document.styleSheets;
-  for (var i = 0; i < sheets.length; i++) {
-    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
-    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    var j = 0;
-    while (j < rules.length) {
-      var rule = rules[j];
-      // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
-        j++;
-        continue;
-      }
-      var style = rule.style.cssText;
-      // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') {
-        j++;
-        continue;
-      }
-      // replace div.sourceCode by a pre.sourceCode rule
-      sheets[i].deleteRule(j);
-      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
-    }
-  }
-})();
 </script>
 
 
 
 
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
 
 
 
@@ -305,6 +218,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -327,28 +243,33 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Simulator NAME?</a>
+      <a class="navbar-brand" href="index.html">ST-COS</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Main.html">About</a>
+  <a href="index.html">Overview</a>
 </li>
 <li>
-  <a href="Example.html">Example</a>
-</li>
-<li>
-  <a href="Shiny_tutorial.html">Shiny App</a>
-</li>
-<li>
-  <a href="Data_code.html">Reproduce</a>
+  <a href="Main.html">How it works</a>
 </li>
 <li>
   <a href="Rpackage.html">Installation</a>
 </li>
+<li>
+  <a href="Example.html">Reference-free</a>
+</li>
+<li>
+  <a href="Data_code.html">Reference-based</a>
+</li>
+<li>
+  <a href="Shiny_tutorial.html">Interpretation</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/Yiyannnnn/ST-COS">GitHub</a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -356,236 +277,215 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">Example</h1>
-
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
 </div>
 
 
-<div id="get-started" class="section level3">
-<h3>Get Started</h3>
-<p>To get started, please load the #Simulator Name# package</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(Seurat)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(SingleCellExperiment)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(scuttle)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">library</span>(energy)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">library</span>(funfun)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">library</span>(ggsci)</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">library</span>(egg)</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">library</span>(expm)</span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">library</span>(BASS)</span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="fu">library</span>(STdeconvolve)</span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="fu">library</span>(SpaceX)</span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="fu">library</span>(BayesSpace)</span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;~/Desktop/simulator_YZ.R&quot;</span>)</span></code></pre></div>
+
+<h1 class="title toc-ignore">Reference-free Simulation</h1>
+
 </div>
-<div id="parameter-setting" class="section level3">
-<h3>Parameter Setting</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>svg_num<span class="ot">=</span><span class="dv">50</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>noise_num<span class="ot">=</span><span class="dv">100</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>x_len <span class="ot">&lt;-</span> <span class="dv">100</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>y_len <span class="ot">&lt;-</span> <span class="dv">100</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>nGenes <span class="ot">&lt;-</span> <span class="dv">150</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>gene_pattern <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">ct1 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&#39;hotspot&#39;</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="st">&#39;streak&#39;</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="st">&#39;no_pattern&#39;</span>,<span class="dv">130</span>)),</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>                          <span class="at">ct2=</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&#39;no_pattern&#39;</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="st">&#39;streak&#39;</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="st">&#39;hotspot&#39;</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="st">&#39;no_pattern&#39;</span>,<span class="dv">120</span>)),</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>                          <span class="at">ct3 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&#39;no_pattern&#39;</span>,<span class="dv">30</span>),<span class="fu">rep</span>(<span class="st">&#39;hotspot&#39;</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="st">&#39;layer&#39;</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="st">&#39;no_pattern&#39;</span>,<span class="dv">100</span>)))</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>streak_x <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">ct1 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">10</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">20</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">30</span>,<span class="dv">4</span>)),</span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>                       <span class="at">ct2 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">60</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">70</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">80</span>,<span class="dv">4</span>)))</span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>hot_spot_center <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">ct1 =</span> <span class="fu">data.frame</span>(<span class="at">x_coord =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">25</span>,<span class="dv">10</span>)), <span class="at">y_coord =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">25</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">50</span>,<span class="dv">4</span>),<span class="fu">rep</span>(<span class="dv">75</span>,<span class="dv">3</span>))),</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>                        <span class="at">ct2 =</span> <span class="fu">data.frame</span>(<span class="at">x_coord =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">25</span>,<span class="dv">4</span>),<span class="fu">rep</span>(<span class="dv">75</span>,<span class="dv">6</span>)), <span class="at">y_coord =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">75</span>,<span class="dv">7</span>),<span class="fu">rep</span>(<span class="dv">25</span>,<span class="dv">3</span>))),</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>                        <span class="at">ct3 =</span> <span class="fu">data.frame</span>(<span class="at">x_coord =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">25</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">50</span>,<span class="dv">4</span>),<span class="fu">rep</span>(<span class="dv">75</span>,<span class="dv">3</span>)), <span class="at">y_coord =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">75</span>,<span class="dv">10</span>))))</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>gene_relationship <span class="ot">=</span> <span class="fu">data.table</span>(<span class="at">ct1 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">2</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">3</span>,<span class="dv">4</span>),<span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">130</span>)),</span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>                               <span class="at">ct2 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">2</span>,<span class="dv">3</span>),<span class="fu">rep</span>(<span class="dv">3</span>,<span class="dv">4</span>),<span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">130</span>)),</span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>                               <span class="at">ct3 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">40</span>),<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">10</span>),<span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">100</span>)))</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>layer_param <span class="ot">=</span>  <span class="fu">data.frame</span>(<span class="at">ct1 =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>,<span class="dv">0</span>,<span class="dv">0</span>),</span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>                          <span class="at">ct2 =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>,<span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,<span class="dv">4</span><span class="sc">/</span><span class="dv">5</span>),</span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>                          <span class="at">ct3 =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>,<span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,<span class="dv">1</span><span class="sc">/</span><span class="dv">5</span>))</span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co"># layer_param = data.frame(ct1 = c(1/3,1/3,1/3,1/3),</span></span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#                          ct2 = c(1/3,1/3,1/3,1/3),</span></span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#                          ct3 = c(1/3,1/3,1/3,1/3))</span></span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#define layer</span></span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>xmin <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">50</span>)</span>
-<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>xmax <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>ymin <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">0</span>, <span class="dv">50</span>)</span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>ymax <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">50</span>, <span class="dv">100</span>)</span></code></pre></div>
+
+<div id="TOC">
+<ul>
+<li><a href="#generate-coordinates">1. Generate coordinates</a></li>
+<li><a href="#specify-spatial-mean-patterns">2. Specify spatial mean patterns</a></li>
+<li><a href="#specify-latent-gene-dependence">3. Specify latent gene dependence</a></li>
+<li><a href="#generate-cell-type-specific-profiles">4. Generate cell-type-specific profiles</a></li>
+<li><a href="#define-cell-type-composition">5. Define cell-type composition</a></li>
+<li><a href="#construct-spot-level-expression">6. Construct spot-level expression</a></li>
+<li><a href="#inspect-the-requested-and-realized-dependence">7. Inspect the requested and realized dependence</a></li>
+<li><a href="#customize-the-scenario">Customize the scenario</a></li>
+</ul>
 </div>
-<div id="simulation" class="section level3">
-<h3>Simulation</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>coord <span class="ot">=</span> <span class="fu">generate_coordinates</span>(x_len,y_len,<span class="st">&#39;hex&#39;</span>,<span class="at">spot_distance=</span><span class="dv">5</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>mean_param <span class="ot">=</span> <span class="fu">generate_gene_pattern</span>(<span class="at">coord=</span>coord,<span class="at">gene_pattern=</span>gene_pattern,<span class="at">seed=</span><span class="dv">123</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                                   <span class="at">center_coord =</span> hot_spot_center,</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                                   <span class="at">streak_x =</span> streak_x)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>cov_gene <span class="ot">&lt;-</span> <span class="fu">generate_covariance_group</span>(gene_relationship)</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>true_count <span class="ot">&lt;-</span> <span class="fu">generate_true_count</span>(coord,mean_param,gene_relationship,cov_gene)</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>layer_coord <span class="ot">&lt;-</span> <span class="fu">generate_layer</span>(coord, xmin, xmax, ymin, ymax)</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>celltype_proportion <span class="ot">&lt;-</span> <span class="fu">generate_cell_prop</span>(layer_coord,layer_param)</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#seq_count &lt;- generate_batch_count(true_count, p0 = 0.05, celltype_proportion, seq_depth = 1e6) #optional</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>spot_count_layers <span class="ot">&lt;-</span> <span class="fu">generate_spot_count</span>(true_count, nGenes, <span class="at">cell_number =</span> <span class="fu">rep</span>(<span class="dv">10</span>,<span class="fu">nrow</span>(coord)), celltype_proportion)</span></code></pre></div>
-<p><em>Celltype 1 count corr structure</em></p>
-<p><img src="Example_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p><em>Celltype 2 count corr structure</em></p>
-<p><img src="Example_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<p><em>Celltype 3 count corr structure</em></p>
-<p><img src="Example_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p><em>Spot count corr structure</em></p>
-<p><img src="Example_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<p><em>cell-type composition and layer segmentation</em></p>
-<p><img src="Example_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+
+<p>This tutorial builds a small simulation with two cell types, four genes, cell-type-specific spatial patterns, and one dependence block per cell type. Only ST-COS and base R are required.</p>
+<div id="generate-coordinates" class="section level2">
+<h2>1. Generate coordinates</h2>
+<pre class="r"><code>set.seed(1)
+
+coord &lt;- generate_coordinates(
+  x_len = 10,
+  y_len = 10,
+  pattern = &quot;grid&quot;,
+  spot_distance = 1
+)
+rownames(coord) &lt;- paste0(&quot;spot_&quot;, seq_len(nrow(coord)))
+
+dim(coord)</code></pre>
+<pre><code>## [1] 121   2</code></pre>
+<pre class="r"><code>head(coord)</code></pre>
+<pre><code>##    x_coord y_coord
+##      &lt;num&gt;   &lt;num&gt;
+## 1:       0       0
+## 2:       1       0
+## 3:       2       0
+## 4:       3       0
+## 5:       4       0
+## 6:       5       0</code></pre>
+<p><code>pattern</code> can be <code>"grid"</code>, <code>"hex"</code>, or <code>"random"</code>. For random coordinates, provide <code>n_spot</code> instead of <code>spot_distance</code>.</p>
 </div>
-<div id="downstream-analysis-example" class="section level1">
-<h1>Downstream analysis example</h1>
-<div id="umap" class="section level3">
-<h3>UMAP</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">SingleCellExperiment</span>(<span class="at">assays =</span> <span class="fu">list</span>(<span class="at">counts=</span><span class="fu">t</span>(spot_count_layers)))</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">colData</span>(sce)<span class="sc">$</span>layer <span class="ot">=</span> <span class="fu">as.factor</span>(layer_coord<span class="sc">$</span>layer)</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">logNormCounts</span>(sce)</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">runPCA</span>(sce, <span class="at">exprs_values =</span> <span class="st">&quot;logcounts&quot;</span>,<span class="at">scale =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">runUMAP</span>(sce, <span class="at">dimred =</span> <span class="st">&quot;PCA&quot;</span>, <span class="at">name =</span> <span class="st">&quot;UMAP&quot;</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sce, <span class="at">dimred =</span> <span class="st">&quot;UMAP&quot;</span>,<span class="at">colour_by =</span> <span class="st">&quot;layer&quot;</span>) </span></code></pre></div>
-<p><img src="Example_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<div id="specify-spatial-mean-patterns" class="section level2">
+<h2>2. Specify spatial mean patterns</h2>
+<p>Rows of <code>gene_pattern</code> are genes and columns are cell types. Available labels are <code>"hotspot"</code>, <code>"streak"</code>, <code>"layer"</code>, and <code>"no_pattern"</code>.</p>
+<pre class="r"><code>genes &lt;- paste0(&quot;gene_&quot;, 1:4)
+
+gene_pattern &lt;- data.frame(
+  Excitatory = c(&quot;hotspot&quot;, &quot;hotspot&quot;, &quot;no_pattern&quot;, &quot;no_pattern&quot;),
+  Inhibitory = c(&quot;no_pattern&quot;, &quot;no_pattern&quot;, &quot;streak&quot;, &quot;streak&quot;),
+  row.names = genes
+)
+
+mean_param &lt;- generate_gene_pattern(
+  coord = coord,
+  gene_pattern = gene_pattern,
+  seed = 1
+)
+
+lapply(mean_param, dim)</code></pre>
+<pre><code>## $Excitatory
+## [1] 121   4
+## 
+## $Inhibitory
+## [1] 121   4</code></pre>
+<p>Each element of <code>mean_param</code> is a spot-by-gene mean matrix. The optional pattern arguments let users set hotspot centers and radii, streak positions and widths, or per-layer means.</p>
+<pre class="r"><code>plot_field &lt;- function(values, title) {
+  palette &lt;- hcl.colors(100, &quot;YlOrRd&quot;, rev = TRUE)
+  index &lt;- cut(values, breaks = 100, include.lowest = TRUE, labels = FALSE)
+  plot(
+    coord$x_coord, coord$y_coord,
+    pch = 21, bg = palette[index], col = NA,
+    asp = 1, xlab = &quot;x&quot;, ylab = &quot;y&quot;, main = title
+  )
+}
+
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+plot_field(mean_param$Excitatory[, &quot;gene_1&quot;], &quot;Excitatory: gene_1&quot;)
+plot_field(mean_param$Inhibitory[, &quot;gene_3&quot;], &quot;Inhibitory: gene_3&quot;)</code></pre>
+<p><img src="Example_files/figure-html/plot-means-1.png" alt="" width="768" /></p>
 </div>
-<div id="domain-segemntation" class="section level3">
-<h3>Domain segemntation</h3>
-<div id="bass" class="section level4">
-<h4>BASS</h4>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>cnts <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">t</span>(spot_count_layers))</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">colnames</span>(cnts[[<span class="dv">1</span>]]) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;spot_&quot;</span>,<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(cnts[[<span class="dv">1</span>]]))</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>xy <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">as.matrix</span>(coord))</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">rownames</span>(xy[[<span class="dv">1</span>]]) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;spot_&quot;</span>,<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(cnts[[<span class="dv">1</span>]]))</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>BASS <span class="ot">&lt;-</span> <span class="fu">createBASSObject</span>(cnts, xy, <span class="at">C =</span> <span class="dv">3</span>, <span class="at">R =</span> <span class="dv">4</span>, <span class="at">beta_method =</span> <span class="st">&quot;SW&quot;</span>,<span class="at">burnin =</span> <span class="dv">10000</span>)</span></code></pre></div>
-<pre><code>## ***************************************
-##   INPUT INFO:
-##     - Number of tissue sections: 1 
-##     - Number of cells/spots: 492 
-##     - Number of genes: 150 
-##     - Potts interaction parameter estimation method: SW 
-##       - Estimate Potts interaction parameter with SW algorithm
-##   To list all hyper-parameters, Type listAllHyper(BASS_object)
-## ***************************************</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">listAllHyper</span>(BASS)</span></code></pre></div>
-<pre><code>## ***************************************
-##   Please refer to the paper for details of the paramters
-##   ALL HYPER-PARAMETERS:
-##     - Number of cell types C: 3
-##     - Number of spatial domains R: 4
-##     - Initialization method: kmeans
-##     - Scale matrix of the inverse-Wishart prior Psi0: 1I
-##     - Degrees of freedom of the inverse-Wishart prior n0: 1
-##     - Number of MCMC burn-in iterations: 10000
-##     - Number of MCMC posterior samples: 5000
-##     - Potts interaction parameter estimation approach: SW
-##     - Number of burn-in interations in Potts sampling: 10
-##     - Number of Potts samples to approximate the partition ratio: 10
-##     - Step size of a uniform random walk: 0.1
-##     - Threshold of convergence for beta: 0.001
-##     - Concentration parameter of the Dirichlet prior alpha0: 1
-##     - Minimum number of neighbors for each cell/spot based on the Euclidean distance: 4
-## ***************************************</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>BASS <span class="ot">&lt;-</span> <span class="fu">BASS.preprocess</span>(BASS,<span class="at">doLogNormalize =</span> <span class="cn">TRUE</span>, <span class="at">doPCA =</span> <span class="cn">TRUE</span>, <span class="at">scaleFeature =</span> <span class="cn">TRUE</span>, <span class="at">nPC =</span> <span class="dv">20</span>,<span class="at">doBatchCorrect =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
-<pre><code>## ***** Log-normalize gene expression data *****
-## ***** Exclude genes with 0 expression *****
-## ***** Reduce data dimension with PCA *****</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>BASS <span class="ot">&lt;-</span> <span class="fu">BASS.run</span>(BASS)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>BASS <span class="ot">&lt;-</span> <span class="fu">BASS.postprocess</span>(BASS)</span></code></pre></div>
-<pre><code>## Post-processing...
-## done</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>BASS_layer <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(<span class="fu">unlist</span>(BASS<span class="sc">@</span>results<span class="sc">$</span>z))</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>coord_prop_layer <span class="ot">&lt;-</span> <span class="fu">cbind</span>(coord_prop,layer_factor,BASS_layer)</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">ggplot</span>(coord_prop_layer)<span class="sc">+</span><span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x=</span>x_coord,<span class="at">y=</span>y_coord,<span class="at">color=</span>BASS_layer),<span class="at">shape=</span><span class="dv">21</span>,<span class="at">size=</span><span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="fu">coord_fixed</span>()<span class="sc">+</span><span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">1</span>,x_len<span class="sc">+</span><span class="dv">1</span>)<span class="sc">+</span><span class="fu">ylim</span>(<span class="sc">-</span><span class="dv">1</span>,y_len<span class="sc">+</span><span class="dv">1</span>)<span class="sc">+</span><span class="fu">theme_article</span>()<span class="sc">+</span><span class="fu">scale_fill_distiller</span>(<span class="at">palette =</span> <span class="st">&quot;Spectral&quot;</span>)</span></code></pre></div>
-<p><img src="Example_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<div id="specify-latent-gene-dependence" class="section level2">
+<h2>3. Specify latent gene dependence</h2>
+<p><code>gene_relationship</code> identifies the genes included in each dependence block. <code>NA</code> marks genes simulated independently in that cell type.</p>
+<pre class="r"><code>gene_relationship &lt;- data.frame(
+  Excitatory = c(1, 1, NA, NA),
+  Inhibitory = c(NA, NA, 1, 1),
+  row.names = genes
+)
+
+rho &lt;- array(
+  0,
+  dim = c(4, 4, 2),
+  dimnames = list(genes, genes, c(&quot;Excitatory&quot;, &quot;Inhibitory&quot;))
+)
+diag(rho[, , &quot;Excitatory&quot;]) &lt;- 1
+diag(rho[, , &quot;Inhibitory&quot;]) &lt;- 1
+
+rho[1, 2, &quot;Excitatory&quot;] &lt;- rho[2, 1, &quot;Excitatory&quot;] &lt;- 0.6
+rho[3, 4, &quot;Inhibitory&quot;] &lt;- rho[4, 3, &quot;Inhibitory&quot;] &lt;- 0.6</code></pre>
+<p>The value <code>0.6</code> is a <strong>latent Gaussian correlation</strong>, not a guarantee that the final count-scale Pearson correlation will equal 0.6.</p>
 </div>
-<div id="bayesspace" class="section level4">
-<h4>BayesSpace</h4>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>sce_BayesSpace <span class="ot">&lt;-</span> sce</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>row <span class="ot">=</span> coord<span class="sc">$</span>x</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>col <span class="ot">=</span> coord<span class="sc">$</span>y</span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="fu">colData</span>(sce_BayesSpace) <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">colData</span>(sce_BayesSpace), row, col)</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="dv">4</span>  <span class="co"># Number of clusters</span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="dv">15</span>  <span class="co"># Number of PCs</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>sce_BayesSpace <span class="ot">&lt;-</span> <span class="fu">logNormCounts</span>(sce_BayesSpace)</span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>sce_BayesSpace <span class="ot">&lt;-</span> scater<span class="sc">::</span><span class="fu">runPCA</span>(sce_BayesSpace)</span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a></span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>sce_BayesSpace <span class="ot">=</span> <span class="fu">spatialPreprocess</span>(sce_BayesSpace, <span class="at">skip.PCA =</span> T, <span class="at">platform =</span> <span class="st">&quot;Visium&quot;</span>, <span class="at">log.normalize =</span> F) </span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#add BayesSpace metadata, without messing with PCA/logcounts</span></span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a></span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>sce_BayesSpace <span class="ot">&lt;-</span> <span class="fu">spatialCluster</span>(sce_BayesSpace, <span class="at">q=</span>q, <span class="at">d=</span>d, <span class="at">platform =</span> <span class="st">&quot;Visium&quot;</span>,</span>
-<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>                        <span class="at">nrep=</span><span class="dv">50000</span>, <span class="at">gamma=</span><span class="dv">3</span>, <span class="at">save.chain=</span><span class="cn">TRUE</span>, <span class="at">model =</span> <span class="st">&quot;t&quot;</span>)</span></code></pre></div>
-<pre><code>## Neighbors were identified for 0 out of 492 spots.</code></pre>
-<pre><code>## Fitting model...</code></pre>
-<pre><code>## Calculating labels using iterations 1000 through 50000.</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>BayesSpace.labels <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(sce_BayesSpace<span class="sc">$</span>spatial.cluster)</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>coord_prop_layer <span class="ot">&lt;-</span> <span class="fu">cbind</span>(coord_prop,layer_factor,BayesSpace.labels)</span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="fu">ggplot</span>(coord_prop_layer)<span class="sc">+</span><span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x=</span>x_coord,<span class="at">y=</span>y_coord,<span class="at">color=</span>BayesSpace.labels),<span class="at">shape=</span><span class="dv">21</span>,<span class="at">size=</span><span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>  <span class="fu">coord_fixed</span>()<span class="sc">+</span><span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">1</span>,x_len<span class="sc">+</span><span class="dv">1</span>)<span class="sc">+</span><span class="fu">ylim</span>(<span class="sc">-</span><span class="dv">1</span>,y_len<span class="sc">+</span><span class="dv">1</span>)<span class="sc">+</span><span class="fu">theme_article</span>()<span class="sc">+</span><span class="fu">scale_fill_distiller</span>(<span class="at">palette =</span> <span class="st">&quot;Spectral&quot;</span>)</span></code></pre></div>
-<p><img src="Example_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<div id="generate-cell-type-specific-profiles" class="section level2">
+<h2>4. Generate cell-type-specific profiles</h2>
+<pre class="r"><code>cell_type_profiles &lt;- generate_true_count(
+  coord = coord,
+  mean_param = mean_param,
+  gene_relationship = gene_relationship,
+  cov_gene = rho,
+  theta_g = list(
+    Excitatory = rep(10, length(genes)),
+    Inhibitory = rep(10, length(genes))
+  ),
+  eigen_floor = 1e-6
+)
+
+lapply(cell_type_profiles, dim)</code></pre>
+<pre><code>## $Excitatory
+## [1] 121   4
+## 
+## $Inhibitory
+## [1] 121   4</code></pre>
+<pre class="r"><code>cell_type_profiles$Excitatory[1:4, ]</code></pre>
+<pre><code>##        gene_1 gene_2 gene_3 gene_4
+## spot_1    146     25     47     82
+## spot_2     89     16     43    142
+## spot_3     81     19     73    136
+## spot_4    150     35     76     54</code></pre>
+<p>Larger negative-binomial size values imply lower overdispersion at a fixed mean. A separate value can be supplied for every gene and cell type.</p>
 </div>
+<div id="define-cell-type-composition" class="section level2">
+<h2>5. Define cell-type composition</h2>
+<p>Here, excitatory abundance increases smoothly from left to right.</p>
+<pre class="r"><code>p_excitatory &lt;- plogis((coord$x_coord - 5) / 1.5)
+celltype_proportion &lt;- cbind(
+  Excitatory = p_excitatory,
+  Inhibitory = 1 - p_excitatory
+)
+rownames(celltype_proportion) &lt;- rownames(coord)
+
+range(rowSums(celltype_proportion))</code></pre>
+<pre><code>## [1] 1 1</code></pre>
+<pre class="r"><code>head(celltype_proportion)</code></pre>
+<pre><code>##        Excitatory Inhibitory
+## spot_1 0.03444520  0.9655548
+## spot_2 0.06496917  0.9350308
+## spot_3 0.11920292  0.8807971
+## spot_4 0.20860853  0.7913915
+## spot_5 0.33924363  0.6607564
+## spot_6 0.50000000  0.5000000</code></pre>
+<pre class="r"><code>par(mfrow = c(1, 1), mar = c(4, 4, 3, 1))
+plot_field(celltype_proportion[, &quot;Excitatory&quot;], &quot;Excitatory proportion&quot;)</code></pre>
+<p><img src="Example_files/figure-html/plot-composition-1.png" alt="" width="768" /></p>
 </div>
-<div id="cell-type-deconvolution" class="section level3">
-<h3>Cell-type deconvolution</h3>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>pos <span class="ot">&lt;-</span> coord</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="fu">colnames</span>(pos) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>,<span class="st">&quot;y&quot;</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>cd <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">t</span>(spot_count_layers))</span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="do">## remove pixels with too few genes</span></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">cleanCounts</span>(cd, <span class="at">min.lib.size =</span> <span class="dv">100</span>)</span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="do">## feature select for genes</span></span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">restrictCorpus</span>(counts, <span class="at">removeAbove=</span><span class="fl">2.0</span>, <span class="at">removeBelow =</span> <span class="fl">0.01</span>)</span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="do">## choose optimal number of cell-types</span></span>
-<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>ldas <span class="ot">&lt;-</span> <span class="fu">fitLDA</span>(<span class="fu">t</span>(<span class="fu">as.matrix</span>(corpus)), <span class="at">Ks =</span> <span class="fu">seq</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="at">by =</span> <span class="dv">1</span>))</span>
-<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="do">## get best model results</span></span>
-<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>optLDA <span class="ot">&lt;-</span> <span class="fu">optimalModel</span>(<span class="at">models =</span> ldas, <span class="at">opt =</span> <span class="st">&quot;min&quot;</span>)</span>
-<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="do">## extract deconvolved cell-type proportions (theta) and transcriptional profiles (beta)</span></span>
-<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">getBetaTheta</span>(optLDA, <span class="at">perc.filt =</span> <span class="fl">0.05</span>, <span class="at">betaScale =</span> <span class="dv">1000</span>)</span>
-<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>deconProp <span class="ot">&lt;-</span> results<span class="sc">$</span>theta</span>
-<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>deconGexp <span class="ot">&lt;-</span> results<span class="sc">$</span>beta</span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">vizAllTopics</span>(deconProp, pos,</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>             <span class="at">groups =</span> layer_factor, </span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>             <span class="at">group_cols =</span> <span class="fu">rainbow</span>(<span class="fu">length</span>(<span class="fu">unique</span>(layer_factor))),</span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>             <span class="at">r=</span><span class="dv">2</span>,<span class="at">lwd =</span> <span class="fl">0.5</span>) </span></code></pre></div>
-<pre><code>## Plotting scatterpies for 492 pixels with 3 cell-types...this could take a while if the dataset is large.</code></pre>
-<p><img src="Example_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">mean</span>(result_method1[[<span class="st">&#39;rmse&#39;</span>]]<span class="sc">$</span>value)</span></code></pre></div>
-<pre><code>## [1] 0.2260465</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># distance correlation</span></span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">head</span>(result_method1[[<span class="st">&#39;dcor&#39;</span>]])</span></code></pre></div>
-<pre><code>##    cell_type     value
-##       &lt;char&gt;     &lt;num&gt;
-## 1: celltype1 0.9994146
-## 2: celltype2 0.7954124
-## 3: celltype3 0.8219638</code></pre>
+<div id="construct-spot-level-expression" class="section level2">
+<h2>6. Construct spot-level expression</h2>
+<pre class="r"><code>spot_expression &lt;- generate_spot_count(
+  true_count = cell_type_profiles,
+  nGenes = length(genes),
+  cell_number = 8,
+  celltype_proportion = celltype_proportion
+)
+
+dim(spot_expression)</code></pre>
+<pre><code>## [1] 121   4</code></pre>
+<pre class="r"><code>spot_expression[1:4, ]</code></pre>
+<pre><code>##          gene_1    gene_2   gene_3   gene_4
+## spot_1 271.9651  995.6172 746.7730 401.0935
+## spot_2 405.3099  853.5839 755.4136 238.3704
+## spot_3 471.8406 1082.1217 851.7623 326.9913
+## spot_4 478.2510 1122.0405 513.0330 349.6953</code></pre>
+<p>The rows are spots and the columns are genes. <code>cell_number</code> is interpreted as the total cell-equivalent abundance. Because the construction is a continuous abundance-weighted mixture, the resulting spot values need not be integers.</p>
 </div>
-<div id="gene-gene-coexpression" class="section level3">
-<h3>Gene-gene coexpression</h3>
-<div id="spacex-longleaf-r4.1.0" class="section level4">
-<h4>SpaceX (longleaf R/4.1.0)</h4>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>SpaceX_fit <span class="ot">&lt;-</span> <span class="fu">SpaceX</span>(spot_count_layers,pos,layer_factor,<span class="at">sPMM=</span><span class="cn">FALSE</span>,<span class="at">Post_process =</span> <span class="cn">TRUE</span>,<span class="at">numCore =</span> <span class="dv">2</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">corrplot</span>(<span class="fu">as.matrix</span>(SpaceX_fit[[<span class="st">&quot;Shared_network&quot;</span>]][<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]))</span></code></pre></div>
-<p><img src="Example_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<div id="inspect-the-requested-and-realized-dependence" class="section level2">
+<h2>7. Inspect the requested and realized dependence</h2>
+<pre class="r"><code>requested &lt;- rho[, , &quot;Excitatory&quot;]
+realized_pearson &lt;- cor(cell_type_profiles$Excitatory, method = &quot;pearson&quot;)
+realized_spearman &lt;- cor(cell_type_profiles$Excitatory, method = &quot;spearman&quot;)
+
+round(c(
+  latent = requested[1, 2],
+  count_pearson = realized_pearson[1, 2],
+  count_spearman = realized_spearman[1, 2]
+), 3)</code></pre>
+<pre><code>##         latent  count_pearson count_spearman 
+##          0.600          0.200          0.184</code></pre>
+<p>Differences between the requested latent value and count-scale estimates are expected. They depend on the means, dispersions, zero frequencies, spatial mean patterns, and aggregation.</p>
 </div>
-</div>
+<div id="customize-the-scenario" class="section level2">
+<h2>Customize the scenario</h2>
+<ul>
+<li>Change <code>gene_pattern</code> to move spatial signal among genes or cell types.</li>
+<li>Edit one block of <code>rho</code> to create a controlled dependence intervention.</li>
+<li>Replace <code>celltype_proportion</code> with an externally generated abundance field.</li>
+<li>Pass a vector to <code>cell_number</code> to vary total abundance by spot.</li>
+<li>Use <code>generate_batch_count()</code> to add dropout and sequencing-depth effects.</li>
+</ul>
+<p>For fitted simulations, continue to the <a href="Data_code.html">reference-based tutorial</a>.</p>
 </div>
 
 
@@ -621,6 +521,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

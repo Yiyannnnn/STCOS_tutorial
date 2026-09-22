@@ -1,350 +1,199 @@
 ---
-title: "Example"
+title: "Reference-free Simulation"
 output: html_document
 ---
 
-### Get Started
-
-To get started, please load the #Simulator Name# package
-
-```{r, message=FALSE}
-library(Seurat)
-library(SingleCellExperiment)
-library(scuttle)
-library(scater)
-library(ggplot2)
-library(energy)
-library(funfun)
-library(data.table)
-library(cowplot)
-library(corrplot)
-library(ggsci)
-library(egg)
-library(expm)
-library(BASS)
-library(STdeconvolve)
-library(SpaceX)
-library(BayesSpace)
-
-source("~/Desktop/simulator_YZ.R")
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 8,
+  fig.height = 4.5
+)
+library(STCOS)
 ```
 
+This tutorial builds a small simulation with two cell types, four genes,
+cell-type-specific spatial patterns, and one dependence block per cell type.
+Only ST-COS and base R are required.
 
-### Parameter Setting
+## 1. Generate coordinates
 
-
-```{r}
+```{r coordinates}
 set.seed(1)
-svg_num=50
-noise_num=100
 
-x_len <- 100
-y_len <- 100
-nGenes <- 150
+coord <- generate_coordinates(
+  x_len = 10,
+  y_len = 10,
+  pattern = "grid",
+  spot_distance = 1
+)
+rownames(coord) <- paste0("spot_", seq_len(nrow(coord)))
 
-
-gene_pattern = data.frame(ct1 = c(rep('hotspot',10),rep('streak',10),rep('no_pattern',130)),
-                          ct2= c(rep('no_pattern',10),rep('streak',10),rep('hotspot',10),rep('no_pattern',120)),
-                          ct3 = c(rep('no_pattern',30),rep('hotspot',10),rep('layer',10),rep('no_pattern',100)))
-
-
-streak_x <- data.frame(ct1 = c(rep(10,3),rep(20,3),rep(30,4)),
-                       ct2 = c(rep(60,3),rep(70,3),rep(80,4)))
-
-hot_spot_center <- list(ct1 = data.frame(x_coord = c(rep(25,10)), y_coord = c(rep(25,3),rep(50,4),rep(75,3))),
-                        ct2 = data.frame(x_coord = c(rep(25,4),rep(75,6)), y_coord = c(rep(75,7),rep(25,3))),
-                        ct3 = data.frame(x_coord = c(rep(25,3),rep(50,4),rep(75,3)), y_coord = c(rep(75,10))))
-
-gene_relationship = data.table(ct1 = c(rep(NA,10),rep(1,3),rep(2,3),rep(3,4),rep(NA,130)),
-                               ct2 = c(rep(NA,10),rep(1,3),rep(2,3),rep(3,4),rep(NA,130)),
-                               ct3 = c(rep(NA,40),rep(1,10),rep(NA,100)))
-
-
-layer_param =  data.frame(ct1 = c(1,1/3,0,0),
-                          ct2 = c(0,1/3,1/2,4/5),
-                          ct3 = c(0,1/3,1/2,1/5))
-
-# layer_param = data.frame(ct1 = c(1/3,1/3,1/3,1/3),
-#                          ct2 = c(1/3,1/3,1/3,1/3),
-#                          ct3 = c(1/3,1/3,1/3,1/3))
-
-#define layer
-xmin <- c(0, 0, 50, 50)
-xmax <- c(50, 50, 100, 100)
-ymin <- c(0, 50, 0, 50)
-ymax <- c(50, 100, 50, 100)
-
-
-
-
+dim(coord)
+head(coord)
 ```
 
-```{r,include=FALSE,message=FALSE}
-rownames(gene_pattern) = paste0('gene',1:nGenes)
-rownames(gene_relationship) = paste0('gene',1:nGenes)
+`pattern` can be `"grid"`, `"hex"`, or `"random"`. For random coordinates,
+provide `n_spot` instead of `spot_distance`.
+
+## 2. Specify spatial mean patterns
+
+Rows of `gene_pattern` are genes and columns are cell types. Available labels
+are `"hotspot"`, `"streak"`, `"layer"`, and `"no_pattern"`.
+
+```{r mean-patterns}
+genes <- paste0("gene_", 1:4)
+
+gene_pattern <- data.frame(
+  Excitatory = c("hotspot", "hotspot", "no_pattern", "no_pattern"),
+  Inhibitory = c("no_pattern", "no_pattern", "streak", "streak"),
+  row.names = genes
+)
+
+mean_param <- generate_gene_pattern(
+  coord = coord,
+  gene_pattern = gene_pattern,
+  seed = 1
+)
+
+lapply(mean_param, dim)
 ```
 
+Each element of `mean_param` is a spot-by-gene mean matrix. The optional
+pattern arguments let users set hotspot centers and radii, streak positions
+and widths, or per-layer means.
 
-### Simulation
-
-```{r,message=FALSE,warning=FALSE}
-
-coord = generate_coordinates(x_len,y_len,'hex',spot_distance=5)
-mean_param = generate_gene_pattern(coord=coord,gene_pattern=gene_pattern,seed=123,
-                                   center_coord = hot_spot_center,
-                                   streak_x = streak_x)
-cov_gene <- generate_covariance_group(gene_relationship)
-true_count <- generate_true_count(coord,mean_param,gene_relationship,cov_gene)
-layer_coord <- generate_layer(coord, xmin, xmax, ymin, ymax)
-celltype_proportion <- generate_cell_prop(layer_coord,layer_param)
-#seq_count <- generate_batch_count(true_count, p0 = 0.05, celltype_proportion, seq_depth = 1e6) #optional
-spot_count_layers <- generate_spot_count(true_count, nGenes, cell_number = rep(10,nrow(coord)), celltype_proportion)
-
-```
-
-```{r,include=FALSE}
-param_all = c()
-for(ct in colnames(gene_pattern)){
-  temp = mean_param[[ct]] %>% as.data.table()
-  temp$cell_type = ct
-  param_all = rbind(param_all,temp)
-}
-coord_param = cbind(coord,param_all)
-coord_param = melt(coord_param,id.vars = c('x_coord','y_coord','cell_type'))
-colnames(coord_param) <- c("x_coord","y_coord","cell_type","variable","mean")
-
-coord_param |> filter(variable %in% paste0("gene",41:50)) |> ggplot()+geom_point(aes(x=x_coord,y=y_coord,fill=mean),shape=21,size=1)+
-  facet_wrap(cell_type~variable,ncol=10)+
-  coord_fixed()+xlim(-1,x_len+1)+ylim(-1,y_len+1)+theme_article()+scale_fill_distiller(palette = "Spectral")
-
-prop_all = c()
-for(ct in colnames(celltype_proportion)){
-  temp = celltype_proportion[,ct] %>% as.data.table()
-  prop_all = cbind(prop_all,temp)
-  colnames(prop_all)[ncol(prop_all)] <- ct
-}
-coord_prop = cbind(coord,prop_all)
-coord_prop = melt(coord_prop,id.vars = c('x_coord','y_coord'))
-colnames(coord_prop) = c('x_coord','y_coord','cell_type','proportion')
-ggplot(coord_prop)+geom_point(aes(x=x_coord,y=y_coord,fill=proportion),shape=21,size=2)+
-  facet_wrap(as.factor(coord_prop$cell_type),ncol=3)+
-  coord_fixed()+xlim(-1,x_len+1)+ylim(-1,y_len+1)+theme_article()+scale_fill_distiller(palette = "Spectral")
-layer_factor = as.numeric(as.factor(layer_coord$layer))
-```
-
-*Celltype 1 count corr structure*
-
-```{r,echo=FALSE,message=FALSE}
-seq_count <- true_count
-corrplot(cor(seq_count[["ct1"]][,1:50],method = "spearman"))
-```
-
-*Celltype 2 count corr structure*
-
-```{r,echo=FALSE,message=FALSE}
-corrplot(cor(seq_count[["ct2"]][,1:50],method = "spearman"))
-```
-
-*Celltype 3 count corr structure*
-
-```{r,echo=FALSE,message=FALSE}
-corrplot(cor(seq_count[["ct3"]][,1:50],method = "spearman"))
-```
-
-*Spot count corr structure*
-
-```{r,echo=FALSE,message=FALSE}
-corrplot(cor(spot_count_layers[,1:50],method = "spearman"))
-```
-
-*cell-type composition and layer segmentation*
-
-```{r,echo=FALSE,message=FALSE}
-# coord_prop = cbind(coord,prop_all)
-# coord_prop = melt(coord_prop,id.vars = c('x_coord','y_coord'))
-coord_prop_layer <- cbind(coord_prop,layer_factor)
-real_prop <- cbind(paste(coord_prop$x_coord,coord_prop$y_coord),coord_prop[,3:4])
-prop_plot <- dcast(real_prop, V1 ~ cell_type)
-prop_plot <- prop_plot |> mutate(x = as.numeric(sapply(V1,function(i) strsplit(i, "\\s+")[[1]][1])),
-                                 y = as.numeric(sapply(V1,function(i) strsplit(i, "\\s+")[[1]][2])))
-prop_plot <- prop_plot |> merge(cbind(paste(coord_prop_layer$x_coord,coord_prop_layer$y_coord),coord_prop_layer[,4:5]), by = "V1") |> 
-  select(V1, ct1,ct2,ct3,x,y,layer_factor) |> unique()
-
-vizAllTopics(prop_plot[,c("ct1","ct2","ct3")], prop_plot[,c("x","y")],
-             groups = prop_plot$layer_factor, 
-             group_cols = rainbow(length(unique(layer_factor))),
-             r=2,lwd = 0.5)	
-```
-
-
-# Downstream analysis example
-
-### UMAP
-
-```{r,warning=FALSE,message=FALSE}
-sce <- SingleCellExperiment(assays = list(counts=t(spot_count_layers)))
-colData(sce)$layer = as.factor(layer_coord$layer)
-sce <- logNormCounts(sce)
-sce <- runPCA(sce, exprs_values = "logcounts",scale = TRUE)
-sce <- runUMAP(sce, dimred = "PCA", name = "UMAP")
-plotReducedDim(sce, dimred = "UMAP",colour_by = "layer") 
-```
-
-
-### Domain segemntation
-
-#### BASS
-
-```{r}
-cnts <- list(t(spot_count_layers))
-colnames(cnts[[1]]) <- paste0("spot_",1:ncol(cnts[[1]]))
-xy <- list(as.matrix(coord))
-rownames(xy[[1]]) <- paste0("spot_",1:ncol(cnts[[1]]))
-BASS <- createBASSObject(cnts, xy, C = 3, R = 4, beta_method = "SW",burnin = 10000)
-
-listAllHyper(BASS)
-BASS <- BASS.preprocess(BASS,doLogNormalize = TRUE, doPCA = TRUE, scaleFeature = TRUE, nPC = 20,doBatchCorrect = FALSE)
-BASS <- BASS.run(BASS)
-BASS <- BASS.postprocess(BASS)
-
-
-BASS_layer <- as.factor(unlist(BASS@results$z))
-coord_prop_layer <- cbind(coord_prop,layer_factor,BASS_layer)
-ggplot(coord_prop_layer)+geom_point(aes(x=x_coord,y=y_coord,color=BASS_layer),shape=21,size=3) +
-  coord_fixed()+xlim(-1,x_len+1)+ylim(-1,y_len+1)+theme_article()+scale_fill_distiller(palette = "Spectral")
-```
-
-#### BayesSpace
-
-```{r}
-sce_BayesSpace <- sce
-row = coord$x
-col = coord$y
-colData(sce_BayesSpace) = cbind(colData(sce_BayesSpace), row, col)
-
-q <- 4  # Number of clusters
-d <- 15  # Number of PCs
-
-sce_BayesSpace <- logNormCounts(sce_BayesSpace)
-
-sce_BayesSpace <- scater::runPCA(sce_BayesSpace)
-
-sce_BayesSpace = spatialPreprocess(sce_BayesSpace, skip.PCA = T, platform = "Visium", log.normalize = F) 
-#add BayesSpace metadata, without messing with PCA/logcounts
-
-sce_BayesSpace <- spatialCluster(sce_BayesSpace, q=q, d=d, platform = "Visium",
-                        nrep=50000, gamma=3, save.chain=TRUE, model = "t")
-
-
-BayesSpace.labels <- as.factor(sce_BayesSpace$spatial.cluster)
-
-coord_prop_layer <- cbind(coord_prop,layer_factor,BayesSpace.labels)
-ggplot(coord_prop_layer)+geom_point(aes(x=x_coord,y=y_coord,color=BayesSpace.labels),shape=21,size=3) +
-  coord_fixed()+xlim(-1,x_len+1)+ylim(-1,y_len+1)+theme_article()+scale_fill_distiller(palette = "Spectral")
-```
-
-
-### Cell-type deconvolution
-
-```{r,eval=FALSE}
-
-pos <- coord
-colnames(pos) <- c("x","y")
-cd <- round(t(spot_count_layers))
-## remove pixels with too few genes
-counts <- cleanCounts(cd, min.lib.size = 100)
-## feature select for genes
-corpus <- restrictCorpus(counts, removeAbove=2.0, removeBelow = 0.01)
-## choose optimal number of cell-types
-ldas <- fitLDA(t(as.matrix(corpus)), Ks = seq(3, 3, by = 1))
-## get best model results
-optLDA <- optimalModel(models = ldas, opt = "min")
-## extract deconvolved cell-type proportions (theta) and transcriptional profiles (beta)
-results <- getBetaTheta(optLDA, perc.filt = 0.05, betaScale = 1000)
-deconProp <- results$theta
-deconGexp <- results$beta
-```
-
-```{r,include=FALSE}
-
-pos <- coord
-colnames(pos) <- c("x","y")
-cd <- round(t(spot_count_layers))
-## remove pixels with too few genes
-counts <- cleanCounts(cd, min.lib.size = 100)
-## feature select for genes
-corpus <- restrictCorpus(counts, removeAbove=2.0, removeBelow = 0.01)
-## choose optimal number of cell-types
-ldas <- fitLDA(t(as.matrix(corpus)), Ks = seq(3, 3, by = 1))
-## get best model results
-optLDA <- optimalModel(models = ldas, opt = "min")
-## extract deconvolved cell-type proportions (theta) and transcriptional profiles (beta)
-results <- getBetaTheta(optLDA, perc.filt = 0.05, betaScale = 1000)
-deconProp <- results$theta
-deconGexp <- results$beta
-
-evaluation_metric = function(truth,data){
-  result_all=list()
-  intersect_spot=intersect(rownames(truth),rownames(data))
-  truth=truth[intersect_spot,]
-  data=data[intersect_spot,]
-  
-  data=data.frame(data,check.names = F)
-  truth=data.frame(truth,check.names=F)
-  
-  intersect_celltype=intersect(colnames(truth),colnames(data))
-  truth=truth[,intersect_celltype]
-  data=data[,intersect_celltype]
-  
-  mse=calc.mse(t(truth), t(data), rsq = FALSE)
-  dcor=rep(0,ncol(data))
-  diff_all = c()
-  for(i in 1:ncol(data)){
-    dcor[i]=as.numeric(dcor.test(truth[,i], data[,i], R=200)$statistic)
-    diff_all=rbind(diff_all,data.frame(V1=rownames(truth),value=data[,i]-truth[,i],cell_type=colnames(data)[i]))
-  }
-  result_all[['mse']]=data.table(V1=rownames(truth),value=mse)
-  result_all[['rmse']]=data.table(V1=rownames(truth),value=sqrt(mse))
-  result_all[['dcor']]=data.table(cell_type=colnames(data),value=dcor)
-  result_all[['diff']]=diff_all
-  return(result_all)
+```{r plot-means}
+plot_field <- function(values, title) {
+  palette <- hcl.colors(100, "YlOrRd", rev = TRUE)
+  index <- cut(values, breaks = 100, include.lowest = TRUE, labels = FALSE)
+  plot(
+    coord$x_coord, coord$y_coord,
+    pch = 21, bg = palette[index], col = NA,
+    asp = 1, xlab = "x", ylab = "y", main = title
+  )
 }
 
-STdeconvolve <- cbind(paste(pos$x,pos$y),deconProp) |> as.data.frame() |> merge(prop_plot,by = "V1")
-truth <- STdeconvolve[,c("ct1","ct2","ct3")]
-method <- apply(STdeconvolve[,c("1","2","3")],2,as.numeric)
-colnames(truth) = c(paste0("celltype",1:3))
-colnames(method) = c(paste0("celltype",1:3))
-rownames(truth) = STdeconvolve$V1
-rownames(method) = STdeconvolve$V1
-result_method1=evaluation_metric(as.matrix(truth),as.matrix(method))
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+plot_field(mean_param$Excitatory[, "gene_1"], "Excitatory: gene_1")
+plot_field(mean_param$Inhibitory[, "gene_3"], "Inhibitory: gene_3")
 ```
 
+## 3. Specify latent gene dependence
 
-```{r}
-vizAllTopics(deconProp, pos,
-             groups = layer_factor, 
-             group_cols = rainbow(length(unique(layer_factor))),
-             r=2,lwd = 0.5)	
+`gene_relationship` identifies the genes included in each dependence block.
+`NA` marks genes simulated independently in that cell type.
 
-mean(result_method1[['rmse']]$value)
-# distance correlation
-head(result_method1[['dcor']])
+```{r dependence}
+gene_relationship <- data.frame(
+  Excitatory = c(1, 1, NA, NA),
+  Inhibitory = c(NA, NA, 1, 1),
+  row.names = genes
+)
+
+rho <- array(
+  0,
+  dim = c(4, 4, 2),
+  dimnames = list(genes, genes, c("Excitatory", "Inhibitory"))
+)
+diag(rho[, , "Excitatory"]) <- 1
+diag(rho[, , "Inhibitory"]) <- 1
+
+rho[1, 2, "Excitatory"] <- rho[2, 1, "Excitatory"] <- 0.6
+rho[3, 4, "Inhibitory"] <- rho[4, 3, "Inhibitory"] <- 0.6
 ```
 
-### Gene-gene coexpression
+The value `0.6` is a **latent Gaussian correlation**, not a guarantee that the
+final count-scale Pearson correlation will equal 0.6.
 
-#### SpaceX (longleaf R/4.1.0)
+## 4. Generate cell-type-specific profiles
 
-```{r,eval=FALSE}
-SpaceX_fit <- SpaceX(spot_count_layers,pos,layer_factor,sPMM=FALSE,Post_process = TRUE,numCore = 2)
+```{r cell-type-profiles}
+cell_type_profiles <- generate_true_count(
+  coord = coord,
+  mean_param = mean_param,
+  gene_relationship = gene_relationship,
+  cov_gene = rho,
+  theta_g = list(
+    Excitatory = rep(10, length(genes)),
+    Inhibitory = rep(10, length(genes))
+  ),
+  eigen_floor = 1e-6
+)
+
+lapply(cell_type_profiles, dim)
+cell_type_profiles$Excitatory[1:4, ]
 ```
 
-```{r,echo=FALSE}
-SpaceX_fit <- readRDS("~/Desktop/ST/SpaceX_4layer.RData")
+Larger negative-binomial size values imply lower overdispersion at a fixed
+mean. A separate value can be supplied for every gene and cell type.
+
+## 5. Define cell-type composition
+
+Here, excitatory abundance increases smoothly from left to right.
+
+```{r composition}
+p_excitatory <- plogis((coord$x_coord - 5) / 1.5)
+celltype_proportion <- cbind(
+  Excitatory = p_excitatory,
+  Inhibitory = 1 - p_excitatory
+)
+rownames(celltype_proportion) <- rownames(coord)
+
+range(rowSums(celltype_proportion))
+head(celltype_proportion)
 ```
 
-```{r}
-corrplot(as.matrix(SpaceX_fit[["Shared_network"]][1:50,1:50]))
+```{r plot-composition}
+par(mfrow = c(1, 1), mar = c(4, 4, 3, 1))
+plot_field(celltype_proportion[, "Excitatory"], "Excitatory proportion")
 ```
 
+## 6. Construct spot-level expression
+
+```{r spot-expression}
+spot_expression <- generate_spot_count(
+  true_count = cell_type_profiles,
+  nGenes = length(genes),
+  cell_number = 8,
+  celltype_proportion = celltype_proportion
+)
+
+dim(spot_expression)
+spot_expression[1:4, ]
+```
+
+The rows are spots and the columns are genes. `cell_number` is interpreted as
+the total cell-equivalent abundance. Because the construction is a continuous
+abundance-weighted mixture, the resulting spot values need not be integers.
+
+## 7. Inspect the requested and realized dependence
+
+```{r inspect-correlation}
+requested <- rho[, , "Excitatory"]
+realized_pearson <- cor(cell_type_profiles$Excitatory, method = "pearson")
+realized_spearman <- cor(cell_type_profiles$Excitatory, method = "spearman")
+
+round(c(
+  latent = requested[1, 2],
+  count_pearson = realized_pearson[1, 2],
+  count_spearman = realized_spearman[1, 2]
+), 3)
+```
+
+Differences between the requested latent value and count-scale estimates are
+expected. They depend on the means, dispersions, zero frequencies, spatial
+mean patterns, and aggregation.
+
+## Customize the scenario
+
+- Change `gene_pattern` to move spatial signal among genes or cell types.
+- Edit one block of `rho` to create a controlled dependence intervention.
+- Replace `celltype_proportion` with an externally generated abundance field.
+- Pass a vector to `cell_number` to vary total abundance by spot.
+- Use `generate_batch_count()` to add dropout and sequencing-depth effects.
+
+For fitted simulations, continue to the
+[reference-based tutorial](Data_code.html).

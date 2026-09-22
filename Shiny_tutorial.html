@@ -11,12 +11,12 @@
 
 
 
-<title>Shiny App</title>
+<title>Interpretation and Limitations</title>
 
-<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -30,6 +30,9 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -40,12 +43,23 @@
   ul.task-list{list-style: none;}
     </style>
 
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
 
 
 
 
 
 
+<link rel="stylesheet" href="styles.css" type="text/css" />
 
 
 
@@ -204,6 +218,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -226,28 +243,33 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Simulator NAME?</a>
+      <a class="navbar-brand" href="index.html">ST-COS</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Main.html">About</a>
+  <a href="index.html">Overview</a>
 </li>
 <li>
-  <a href="Example.html">Example</a>
-</li>
-<li>
-  <a href="Shiny_tutorial.html">Shiny App</a>
-</li>
-<li>
-  <a href="Data_code.html">Reproduce</a>
+  <a href="Main.html">How it works</a>
 </li>
 <li>
   <a href="Rpackage.html">Installation</a>
 </li>
+<li>
+  <a href="Example.html">Reference-free</a>
+</li>
+<li>
+  <a href="Data_code.html">Reference-based</a>
+</li>
+<li>
+  <a href="Shiny_tutorial.html">Interpretation</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/Yiyannnnn/ST-COS">GitHub</a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -255,19 +277,127 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">Shiny App</h1>
-
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
 </div>
 
 
-<div id="get-started" class="section level3">
-<h3>Get Started</h3>
-<p>To get started, please load the #Simulator Name# package.</p>
+
+<h1 class="title toc-ignore">Interpretation and Limitations</h1>
+
 </div>
-<div id="activate-the-shiny-app" class="section level3">
-<h3>Activate the shiny app</h3>
+
+<div id="TOC">
+<ul>
+<li><a href="#latent-and-count-scale-correlation-are-different">Latent and count-scale correlation are different</a></li>
+<li><a href="#what-the-dependence-model-represents">What the dependence model represents</a></li>
+<li><a href="#reference-based-scope">Reference-based scope</a></li>
+<li><a href="#spot-level-abundance-weighting">Spot-level abundance weighting</a></li>
+<li><a href="#positive-definite-repair">Positive-definite repair</a></li>
+<li><a href="#reporting-checklist">Reporting checklist</a></li>
+</ul>
+</div>
+
+<div id="latent-and-count-scale-correlation-are-different" class="section level2">
+<h2>Latent and count-scale correlation are different</h2>
+<p>ST-COS uses a Gaussian copula. The supplied matrix controls Pearson correlation among latent Gaussian variables. After transformation through gene-specific negative-binomial inverse CDFs,</p>
+<p><span class="math display">\[
+W_g \longrightarrow \Phi(W_g) \longrightarrow
+F^{-1}_{\mathrm{NB},g}\{\Phi(W_g)\},
+\]</span></p>
+<p>the realized count-scale Pearson correlation generally differs from the latent target. Spearman correlation can also change because count data contain many ties.</p>
+<p>Attenuation is usually stronger with sparse or highly dispersed marginals. Extra zeros can alter Pearson and Spearman correlation differently. For this reason, report the requested latent value and the realized count-scale value separately.</p>
+<pre class="r"><code>latent_target &lt;- fitted$cov_gene[, , &quot;CT&quot;]
+count_pearson &lt;- cor(simulated_counts, method = &quot;pearson&quot;)
+count_spearman &lt;- cor(simulated_counts, method = &quot;spearman&quot;)</code></pre>
+<p>ST-COS does not currently invert the copula parameter to hit an exact count-scale Pearson target. Such calibration would depend on each gene’s mean, dispersion, and zero frequency.</p>
+</div>
+<div id="what-the-dependence-model-represents" class="section level2">
+<h2>What the dependence model represents</h2>
+<p>The Gaussian copula provides editable <strong>pairwise</strong> dependence. It does not claim to reproduce arbitrary higher-order or tail dependence. Use the terms below consistently:</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>Meaning in ST-COS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Latent correlation</td>
+<td>Pearson correlation in the Gaussian copula</td>
+</tr>
+<tr class="even">
+<td>Count Pearson correlation</td>
+<td>Pearson correlation measured from simulated counts</td>
+</tr>
+<tr class="odd">
+<td>Count Spearman correlation</td>
+<td>Rank correlation measured from simulated counts</td>
+</tr>
+<tr class="even">
+<td>Co-expression edge</td>
+<td>A thresholded or ranked relationship defined by an evaluation rule</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="reference-based-scope" class="section level2">
+<h2>Reference-based scope</h2>
+<p>Reference-based mode estimates one global spot-level dependence matrix. In a heterogeneous tissue, this matrix can reflect both within-cell-type expression and changing cell-type composition. The current release does not deconvolve these sources when estimating dependence.</p>
+<p>Use one of the following when cell-type-specific dependence is required:</p>
+<ol style="list-style-type: decimal">
+<li>Supply externally estimated cell-type-specific matrices.</li>
+<li>Specify the matrices directly in reference-free mode.</li>
+<li>Use a cell-resolved reference and construct each cell-type matrix outside the current reference-based estimator.</li>
+</ol>
+</div>
+<div id="spot-level-abundance-weighting" class="section level2">
+<h2>Spot-level abundance weighting</h2>
+<p><code>generate_spot_count()</code> computes</p>
+<p><span class="math display">\[
+X_{jg}=\sum_c N_jp_{jc}Y_{jg}^{(c)}.
+\]</span></p>
+<p>Here, <span class="math inline">\(Y_{jg}^{(c)}\)</span> is a latent average expression level for cell type <span class="math inline">\(c\)</span> at spot <span class="math inline">\(j\)</span>. The model does not draw and sum <span class="math inline">\(N_jp_{jc}\)</span> independent individual cells. Consequently, <code>cell_number</code> represents cell-equivalent abundance, and the resulting weighted spot profile can contain non-integer values.</p>
+<p>This formulation is useful for controlled spot-level mixtures. It should not be described as an explicit model of within-spot cell-to-cell variability.</p>
+</div>
+<div id="positive-definite-repair" class="section level2">
+<h2>Positive-definite repair</h2>
+<p>Thresholding a correlation matrix can make it non-positive-definite. ST-COS repairs the matrix before Cholesky factorization using <code>eigen_floor</code>, whose default is <code>1e-6</code>.</p>
+<p>Reference fitting returns these diagnostics:</p>
+<ul>
+<li>minimum eigenvalue before and after repair;</li>
+<li>minimum eigenvalue lift;</li>
+<li>number of modified eigenvalues;</li>
+<li>relative Frobenius perturbation; and</li>
+<li>maximum entry-wise change.</li>
+</ul>
+<pre class="r"><code>fitted$matrix_diagnostics</code></pre>
+<p>The floor is a numerical safeguard. By contrast, <code>cor_thr</code> controls sparsification and can materially change the requested matrix.</p>
+</div>
+<div id="reporting-checklist" class="section level2">
+<h2>Reporting checklist</h2>
+<p>For a reproducible ST-COS experiment, report:</p>
+<ul>
+<li>package version and random seed;</li>
+<li>number of spots, genes, and cell types;</li>
+<li>coordinate and composition construction;</li>
+<li>negative-binomial means and sizes;</li>
+<li>requested latent dependence structure;</li>
+<li>realized Pearson and Spearman correlations;</li>
+<li><code>cor_thr</code>, <code>eigen_floor</code>, <code>neighbor_k</code>, <code>spline_k</code>, and <code>dispersion_cap</code> when reference-based fitting is used; and</li>
+<li>matrix-repair diagnostics and runtime environment.</li>
+</ul>
+<p>For benchmark claims, use independent replicates and uncertainty intervals, and avoid ranking language when methods are separated only by near-ties.</p>
+<p>Return to the <a href="index.html">tutorial overview</a>.</p>
 </div>
 
 
@@ -303,6 +433,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

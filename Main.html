@@ -11,12 +11,12 @@
 
 
 
-<title>About</title>
+<title>How ST-COS Works</title>
 
-<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -30,6 +30,9 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -40,12 +43,23 @@
   ul.task-list{list-style: none;}
     </style>
 
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
 
 
 
 
 
 
+<link rel="stylesheet" href="styles.css" type="text/css" />
 
 
 
@@ -204,6 +218,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -226,28 +243,33 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Simulator NAME?</a>
+      <a class="navbar-brand" href="index.html">ST-COS</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Main.html">About</a>
+  <a href="index.html">Overview</a>
 </li>
 <li>
-  <a href="Example.html">Example</a>
-</li>
-<li>
-  <a href="Shiny_tutorial.html">Shiny App</a>
-</li>
-<li>
-  <a href="Data_code.html">Reproduce</a>
+  <a href="Main.html">How it works</a>
 </li>
 <li>
   <a href="Rpackage.html">Installation</a>
 </li>
+<li>
+  <a href="Example.html">Reference-free</a>
+</li>
+<li>
+  <a href="Data_code.html">Reference-based</a>
+</li>
+<li>
+  <a href="Shiny_tutorial.html">Interpretation</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/Yiyannnnn/ST-COS">GitHub</a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -255,18 +277,80 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">About</h1>
-
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
 </div>
 
 
-<div id="simulator-introduction" class="section level3">
-<h3>Simulator Introduction</h3>
+
+<h1 class="title toc-ignore">How ST-COS Works</h1>
+
 </div>
-<div id="workflow-fig" class="section level3">
-<h3>Workflow (Fig?)</h3>
+
+<div id="TOC">
+<ul>
+<li><a href="#generative-structure">Generative structure</a></li>
+<li><a href="#two-simulation-modes">Two simulation modes</a>
+<ul>
+<li><a href="#reference-free">Reference-free</a></li>
+<li><a href="#reference-based">Reference-based</a></li>
+</ul></li>
+<li><a href="#output-orientation">Output orientation</a></li>
+</ul>
+</div>
+
+<div id="generative-structure" class="section level2">
+<h2>Generative structure</h2>
+<p>For spot <span class="math inline">\(j\)</span>, gene <span class="math inline">\(g\)</span>, and cell type <span class="math inline">\(c\)</span>, ST-COS first defines a spatial mean <span class="math inline">\(\mu_{jg}^{(c)}\)</span> and a negative-binomial size parameter <span class="math inline">\(\theta_g^{(c)}\)</span>. Selected genes are coupled through a Gaussian copula:</p>
+<p><span class="math display">\[
+W_j^{(c)} \sim N\left(0, \rho^{(c)}\right), \qquad
+Y_{jg}^{(c)} = F^{-1}_{\mathrm{NB},g,c}
+\left\{\Phi\left(W_{jg}^{(c)}\right)\right\}.
+\]</span></p>
+<p>Here, <span class="math inline">\(\rho^{(c)}\)</span> is the user-specified latent correlation matrix and <span class="math inline">\(Y_{jg}^{(c)}\)</span> is a cell-type-specific average expression level at that spot. It is not an observed count from one individual cell.</p>
+<p>For spot-based data, the final profile is the abundance-weighted mixture</p>
+<p><span class="math display">\[
+X_{jg} = \sum_c n_{jc}Y_{jg}^{(c)}, \qquad n_{jc}=N_jp_{jc},
+\]</span></p>
+<p>where <span class="math inline">\(p_{jc}\)</span> is the cell-type proportion and <span class="math inline">\(N_j\)</span> is the total cell-equivalent abundance for the spot.</p>
+<div class="warning">
+<p>This construction models variation among cell-type-specific spot profiles. It does not simulate within-spot cell-to-cell variability or sum independently sampled individual cells.</p>
+</div>
+</div>
+<div id="two-simulation-modes" class="section level2">
+<h2>Two simulation modes</h2>
+<div id="reference-free" class="section level3">
+<h3>Reference-free</h3>
+<p>The user supplies or generates:</p>
+<ul>
+<li>coordinates;</li>
+<li>cell-type proportions;</li>
+<li>hotspot, streak, layer, or non-spatial mean patterns;</li>
+<li>negative-binomial means and sizes; and</li>
+<li>one latent dependence matrix for each cell type.</li>
+</ul>
+<p>This mode is appropriate when a benchmark requires known truth or a deliberate change to a spatial or dependence parameter.</p>
+</div>
+<div id="reference-based" class="section level3">
+<h3>Reference-based</h3>
+<p><code>get_real_param()</code> estimates:</p>
+<ul>
+<li>gene-wise negative-binomial parameters;</li>
+<li>spatial mean trends for genes passing the Moran’s I criterion;</li>
+<li>a thresholded latent dependence matrix; and</li>
+<li>diagnostics for positive-definite matrix repair.</li>
+</ul>
+<p>The current reference-based workflow estimates one global spot-level dependence matrix. It does not infer cell-type-specific co-regulation from a heterogeneous spot mixture. Cell-type-specific matrices must be supplied from an external source or specified in reference-free mode.</p>
+</div>
+</div>
+<div id="output-orientation" class="section level2">
+<h2>Output orientation</h2>
+<p><code>generate_true_count()</code> returns a named list containing one <strong>spot-by-gene</strong> matrix per cell type. <code>generate_spot_count()</code> returns one <strong>spot-by-gene</strong> abundance-weighted spot matrix. Reference counts supplied to <code>get_real_param()</code> must instead have <strong>genes in rows and spots in columns</strong>.</p>
+<p>Continue with the <a href="Example.html">reference-free</a> or <a href="Data_code.html">reference-based</a> tutorial.</p>
 </div>
 
 
@@ -302,6 +386,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

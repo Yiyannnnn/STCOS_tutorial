@@ -11,12 +11,12 @@
 
 
 
-<title>Reproduce</title>
+<title>Reference-based Simulation</title>
 
-<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -30,6 +30,9 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -40,12 +43,23 @@
   ul.task-list{list-style: none;}
     </style>
 
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
 
 
 
 
 
 
+<link rel="stylesheet" href="styles.css" type="text/css" />
 
 
 
@@ -204,6 +218,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -226,28 +243,33 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Simulator NAME?</a>
+      <a class="navbar-brand" href="index.html">ST-COS</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Main.html">About</a>
+  <a href="index.html">Overview</a>
 </li>
 <li>
-  <a href="Example.html">Example</a>
-</li>
-<li>
-  <a href="Shiny_tutorial.html">Shiny App</a>
-</li>
-<li>
-  <a href="Data_code.html">Reproduce</a>
+  <a href="Main.html">How it works</a>
 </li>
 <li>
   <a href="Rpackage.html">Installation</a>
 </li>
+<li>
+  <a href="Example.html">Reference-free</a>
+</li>
+<li>
+  <a href="Data_code.html">Reference-based</a>
+</li>
+<li>
+  <a href="Shiny_tutorial.html">Interpretation</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/Yiyannnnn/ST-COS">GitHub</a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -255,19 +277,148 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">Reproduce</h1>
-
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
 </div>
 
 
-<div id="data-for-experienments" class="section level1">
-<h1>Data for experienments</h1>
-<p>(parameter setting?)</p>
+
+<h1 class="title toc-ignore">Reference-based Simulation</h1>
+
 </div>
-<div id="analysis-workflow" class="section level1">
-<h1>Analysis workflow</h1>
+
+<div id="TOC">
+<ul>
+<li><a href="#prepare-the-inputs">1. Prepare the inputs</a></li>
+<li><a href="#estimate-reference-parameters">2. Estimate reference parameters</a></li>
+<li><a href="#generate-a-fitted-replay">3. Generate a fitted replay</a></li>
+<li><a href="#create-a-spatial-counterfactual">4. Create a spatial counterfactual</a></li>
+<li><a href="#rewire-a-selected-dependence-block">5. Rewire a selected dependence block</a></li>
+<li><a href="#practical-guidance">6. Practical guidance</a></li>
+</ul>
+</div>
+
+<p>Reference-based mode estimates simulation parameters from an observed spatial transcriptomics dataset. The current release treats the reference as one global spot-level profile (<code>CT</code>) and does not infer separate cell-type-specific dependence matrices.</p>
+<div id="prepare-the-inputs" class="section level2">
+<h2>1. Prepare the inputs</h2>
+<p><code>expr</code> must contain genes in rows and spots in columns. <code>spatial_coord</code> must contain the same spots in the same order, with columns named <code>row</code> and <code>col</code>.</p>
+<pre class="r"><code>stopifnot(
+  is.matrix(expr),
+  ncol(expr) == nrow(spatial_coord),
+  all(c(&quot;row&quot;, &quot;col&quot;) %in% colnames(spatial_coord)),
+  all(is.finite(expr)),
+  all(expr &gt;= 0)
+)
+
+gene_names &lt;- rownames(expr)
+spot_names &lt;- colnames(expr)
+rownames(spatial_coord) &lt;- spot_names</code></pre>
+<p>Use raw non-negative counts. Do not supply log-normalized expression to the negative-binomial fitting step.</p>
+</div>
+<div id="estimate-reference-parameters" class="section level2">
+<h2>2. Estimate reference parameters</h2>
+<pre class="r"><code>library(STCOS)
+
+fitted &lt;- get_real_param(
+  expr = expr,
+  coord = spatial_coord,
+  gene_names = rownames(expr),
+  moran_thr = 0.15,
+  cor_thr = 0.05,
+  block_size = 1024,
+  n_cores = 4,
+  eigen_floor = 1e-6,
+  neighbor_k = 6,
+  spline_k = 50,
+  dispersion_cap = 1e6
+)
+
+names(fitted)
+# mean_param, theta_g, gene_relationship, cov_gene,
+# matrix_diagnostics</code></pre>
+<p>The fitted objects can be inspected before simulation:</p>
+<pre class="r"><code>dim(fitted$mean_param$CT)       # spots x genes
+length(fitted$theta_g$CT)      # one NB size per gene
+dim(fitted$cov_gene[, , &quot;CT&quot;]) # genes x genes
+fitted$matrix_diagnostics</code></pre>
+<p>Matrix-repair diagnostics include the minimum eigenvalues before and after repair, minimum lift, number of modified eigenvalues, relative Frobenius perturbation, and maximum entry-wise change.</p>
+</div>
+<div id="generate-a-fitted-replay" class="section level2">
+<h2>3. Generate a fitted replay</h2>
+<pre class="r"><code>set.seed(11)
+
+replay &lt;- generate_true_count(
+  coord = spatial_coord,
+  mean_param = fitted$mean_param,
+  gene_relationship = fitted$gene_relationship,
+  cov_gene = fitted$cov_gene,
+  theta_g = fitted$theta_g,
+  eigen_floor = 1e-6
+)
+
+simulated_counts &lt;- replay$CT # spots x genes</code></pre>
+<p>This output is a newly generated realization from the fitted marginal, spatial, and latent dependence parameters. It is not a resampled copy of the observed count matrix.</p>
+</div>
+<div id="create-a-spatial-counterfactual" class="section level2">
+<h2>4. Create a spatial counterfactual</h2>
+<p>Because fitted parameters are explicit, a selected spatial mean can be edited while the other fitted parameters remain fixed. The example below increases one gene within a user-defined band.</p>
+<pre class="r"><code>target_gene &lt;- &quot;MOBP&quot;
+band &lt;- spatial_coord$row &gt;= 4 &amp; spatial_coord$row &lt;= 5
+
+edited_mean &lt;- fitted$mean_param
+edited_mean$CT[band, target_gene] &lt;-
+  8 * edited_mean$CT[band, target_gene]
+
+set.seed(11)
+spatial_counterfactual &lt;- generate_true_count(
+  coord = spatial_coord,
+  mean_param = edited_mean,
+  gene_relationship = fitted$gene_relationship,
+  cov_gene = fitted$cov_gene,
+  theta_g = fitted$theta_g
+)$CT</code></pre>
+<p>Use anatomical labels or a prespecified coordinate mask in place of the illustrative row-based band when working with real tissue.</p>
+</div>
+<div id="rewire-a-selected-dependence-block" class="section level2">
+<h2>5. Rewire a selected dependence block</h2>
+<p>The next example changes only one latent correlation block. The matrix is repaired automatically if needed before Cholesky factorization.</p>
+<pre class="r"><code>target_genes &lt;- c(&quot;MOBP&quot;, &quot;CNP&quot;, &quot;MAG&quot;)
+target_genes &lt;- intersect(
+  target_genes,
+  dimnames(fitted$cov_gene)[[1]]
+)
+
+edited_dependence &lt;- fitted$cov_gene
+edited_dependence[target_genes, target_genes, &quot;CT&quot;] &lt;- 0.6
+diag(edited_dependence[, , &quot;CT&quot;]) &lt;- 1
+
+set.seed(11)
+dependence_counterfactual &lt;- generate_true_count(
+  coord = spatial_coord,
+  mean_param = fitted$mean_param,
+  gene_relationship = fitted$gene_relationship,
+  cov_gene = edited_dependence,
+  theta_g = fitted$theta_g
+)$CT</code></pre>
+<p>Evaluate the intervention on both Pearson and Spearman scales, and verify that unedited gene means, dispersions, and dependence edges remain close to the paired replay baseline.</p>
+</div>
+<div id="practical-guidance" class="section level2">
+<h2>6. Practical guidance</h2>
+<ul>
+<li>Keep <code>eigen_floor = 1e-6</code> unless factorization fails; it is a numerical floor, not a parameter that normally requires tuning.</li>
+<li>Treat <code>cor_thr</code> as a modeling choice because it changes dependence-matrix sparsity and fidelity.</li>
+<li>Use <code>neighbor_k = 6</code> for settings comparable to the Visium analyses in the study, and examine other values for different spatial resolutions.</li>
+<li>Increase <code>block_size</code> or <code>n_cores</code> only after confirming memory availability.</li>
+<li>Dense dependence estimation requires quadratic memory and Cholesky factorization requires cubic time in the number of genes.</li>
+</ul>
+<div class="warning">
+<p>A global correlation matrix estimated from heterogeneous spots can contain composition-driven association. Do not interpret it automatically as within-cell-type co-regulation.</p>
+</div>
+<p>See <a href="Shiny_tutorial.html">Interpretation and limitations</a> before using count-scale correlations as benchmark truth.</p>
 </div>
 
 
@@ -303,6 +454,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

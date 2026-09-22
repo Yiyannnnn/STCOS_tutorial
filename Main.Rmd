@@ -1,8 +1,74 @@
 ---
-title: "About"
+title: "How ST-COS Works"
 output: html_document
 ---
 
-### Simulator Introduction
+## Generative structure
 
-### Workflow (Fig?)
+For spot $j$, gene $g$, and cell type $c$, ST-COS first defines a spatial mean
+$\mu_{jg}^{(c)}$ and a negative-binomial size parameter $\theta_g^{(c)}$.
+Selected genes are coupled through a Gaussian copula:
+
+$$
+W_j^{(c)} \sim N\left(0, \rho^{(c)}\right), \qquad
+Y_{jg}^{(c)} = F^{-1}_{\mathrm{NB},g,c}
+\left\{\Phi\left(W_{jg}^{(c)}\right)\right\}.
+$$
+
+Here, $\rho^{(c)}$ is the user-specified latent correlation matrix and
+$Y_{jg}^{(c)}$ is a cell-type-specific average expression level at that spot.
+It is not an observed count from one individual cell.
+
+For spot-based data, the final profile is the abundance-weighted mixture
+
+$$
+X_{jg} = \sum_c n_{jc}Y_{jg}^{(c)}, \qquad n_{jc}=N_jp_{jc},
+$$
+
+where $p_{jc}$ is the cell-type proportion and $N_j$ is the total
+cell-equivalent abundance for the spot.
+
+<div class="warning">
+This construction models variation among cell-type-specific spot profiles. It
+does not simulate within-spot cell-to-cell variability or sum independently
+sampled individual cells.
+</div>
+
+## Two simulation modes
+
+### Reference-free
+
+The user supplies or generates:
+
+- coordinates;
+- cell-type proportions;
+- hotspot, streak, layer, or non-spatial mean patterns;
+- negative-binomial means and sizes; and
+- one latent dependence matrix for each cell type.
+
+This mode is appropriate when a benchmark requires known truth or a deliberate
+change to a spatial or dependence parameter.
+
+### Reference-based
+
+`get_real_param()` estimates:
+
+- gene-wise negative-binomial parameters;
+- spatial mean trends for genes passing the Moran's I criterion;
+- a thresholded latent dependence matrix; and
+- diagnostics for positive-definite matrix repair.
+
+The current reference-based workflow estimates one global spot-level
+dependence matrix. It does not infer cell-type-specific co-regulation from a
+heterogeneous spot mixture. Cell-type-specific matrices must be supplied from
+an external source or specified in reference-free mode.
+
+## Output orientation
+
+`generate_true_count()` returns a named list containing one **spot-by-gene**
+matrix per cell type. `generate_spot_count()` returns one **spot-by-gene**
+abundance-weighted spot matrix. Reference counts supplied to
+`get_real_param()` must instead have **genes in rows and spots in columns**.
+
+Continue with the [reference-free](Example.html) or
+[reference-based](Data_code.html) tutorial.

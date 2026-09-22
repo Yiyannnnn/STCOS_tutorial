@@ -1,30 +1,102 @@
 ---
-title: "Installation"
+title: "Installation and Inputs"
 output: html_document
 ---
 
-#Simulator Name# is implemented as an R package, which can be installed from GitHub by:
+## Install ST-COS
 
-### 1. Install devtools if necessary
+Install the development version directly from GitHub:
 
-\
-\
-\
-\
+```{r installation, eval=FALSE}
+install.packages("devtools") # Skip if devtools is already installed
+devtools::install_github("Yiyannnnn/ST-COS")
+```
 
+Load the package and confirm the installed version:
 
-### 2. Install #Simulator Name#
+```{r load-package, eval=FALSE}
+library(STCOS)
+packageVersion("STCOS")
+```
 
-\
-\
-\
-\
+The package imports `data.table`, `expm`, `mgcv`, and `spdep`. Installing with
+`devtools::install_github()` installs missing CRAN dependencies automatically.
 
-### 3. Load package
+## Input conventions
 
-\
-\
-\
-\
+| Object | Orientation and requirements |
+| --- | --- |
+| Reference count matrix | Genes in rows and spots in columns; non-negative counts |
+| Reference coordinates | One row per spot with numeric columns named `row` and `col` |
+| Reference-free coordinates | One row per spot with columns `x_coord` and `y_coord` |
+| `mean_param` | Named list of spot-by-gene matrices, one per cell type |
+| `theta_g` | Named list containing one NB size per gene, or one shared value |
+| `celltype_proportion` | Spot-by-cell-type matrix; every row sums to one |
+| `cov_gene` | Gene-by-gene matrix or array with one matrix per cell type |
 
+Cell-type names must agree across `mean_param`, `theta_g`,
+`gene_relationship`, `cov_gene`, and the columns of `celltype_proportion`.
 
+## Main functions
+
+| Function | Purpose |
+| --- | --- |
+| `generate_coordinates()` | Create grid, hexagonal, or random locations |
+| `generate_gene_pattern()` | Build cell-type-specific spatial mean matrices |
+| `generate_covariance_group()` | Generate grouped dependence matrices |
+| `generate_true_count()` | Simulate cell-type-specific spot profiles |
+| `generate_spot_count()` | Construct abundance-weighted spot profiles |
+| `generate_batch_count()` | Apply dropout and sequencing-depth effects |
+| `get_real_param()` | Estimate reference-based parameters |
+
+Use `?function_name` in R for argument-level documentation, for example:
+
+```{r help, eval=FALSE}
+?generate_true_count
+?get_real_param
+```
+
+## Reviewed defaults
+
+The reference-based function exposes the sensitivity parameters used in the
+manuscript:
+
+```{r defaults, eval=FALSE}
+fitted <- get_real_param(
+  expr,
+  spatial_coord,
+  rownames(expr),
+  moran_thr = 0.15,
+  cor_thr = 0.05,
+  eigen_floor = 1e-6,
+  neighbor_k = 6,
+  spline_k = 50,
+  dispersion_cap = 1e6,
+  n_cores = 4
+)
+```
+
+- `eigen_floor` is a numerical device; routine searching is not required.
+- `cor_thr` is substantive because it controls sparsification of the fitted
+  dependence matrix.
+- `neighbor_k = 6` is the default used for the Visium analyses in the study,
+  but it remains user-configurable for other spatial resolutions.
+- `dispersion_cap = Inf` requests the explicit Poisson limit when the estimated
+  variance does not exceed the mean.
+
+## Quick installation check
+
+This small check should return a coordinate table with 25 rows:
+
+```{r install-check, eval=FALSE}
+coord <- generate_coordinates(
+  x_len = 4,
+  y_len = 4,
+  pattern = "grid",
+  spot_distance = 1
+)
+dim(coord)
+# [1] 25  2
+```
+
+Next: [run a reference-free simulation](Example.html).

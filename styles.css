@@ -1,0 +1,71 @@
+body {
+  color: #25313c;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  color: #18324a;
+}
+
+h1 {
+  margin-bottom: 0.65em;
+}
+
+h2 {
+  border-bottom: 1px solid #d9e1e8;
+  padding-bottom: 0.25em;
+  margin-top: 1.7em;
+}
+
+.navbar-default {
+  background-color: #15364f;
+  border-color: #15364f;
+}
+
+.navbar-default .navbar-brand,
+.navbar-default .navbar-nav > li > a {
+  color: #ffffff;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover {
+  color: #ffffff;
+  background-color: #285d78;
+}
+
+.lead-copy {
+  font-size: 19px;
+  max-width: 850px;
+}
+
+.workflow-image {
+  display: block;
+  width: 100%;
+  max-width: 1080px;
+  height: auto;
+  margin: 1.5em auto;
+}
+
+.note,
+.warning {
+  border-left: 4px solid #2d7896;
+  background: #eef6f8;
+  padding: 0.8em 1em;
+  margin: 1.2em 0;
+}
+
+.warning {
+  border-left-color: #b06a1f;
+  background: #fff7ea;
+}
+
+table {
+  width: 100%;
+}
+
+pre {
+  border-radius: 4px;
+}
+

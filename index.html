@@ -11,12 +11,12 @@
 
 
 
-<title>About</title>
+<title>ST-COS Tutorial</title>
 
-<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -30,6 +30,9 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -40,12 +43,23 @@
   ul.task-list{list-style: none;}
     </style>
 
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
 
 
 
 
 
 
+<link rel="stylesheet" href="styles.css" type="text/css" />
 
 
 
@@ -204,6 +218,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -226,28 +243,33 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Simulator NAME?</a>
+      <a class="navbar-brand" href="index.html">ST-COS</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Main.html">About</a>
+  <a href="index.html">Overview</a>
 </li>
 <li>
-  <a href="Example.html">Example</a>
-</li>
-<li>
-  <a href="Shiny_tutorial.html">Shiny App</a>
-</li>
-<li>
-  <a href="Data_code.html">Reproduce</a>
+  <a href="Main.html">How it works</a>
 </li>
 <li>
   <a href="Rpackage.html">Installation</a>
 </li>
+<li>
+  <a href="Example.html">Reference-free</a>
+</li>
+<li>
+  <a href="Data_code.html">Reference-based</a>
+</li>
+<li>
+  <a href="Shiny_tutorial.html">Interpretation</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/Yiyannnnn/ST-COS">GitHub</a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -255,18 +277,87 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">About</h1>
-
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
 </div>
 
 
-<div id="simulator-introduction" class="section level3">
-<h3>Simulator Introduction</h3>
+
+<h1 class="title toc-ignore">ST-COS Tutorial</h1>
+
 </div>
-<div id="workflow-fig" class="section level3">
-<h3>Workflow (Fig?)</h3>
+
+<div id="TOC">
+<ul>
+<li><a href="#choose-a-workflow">Choose a workflow</a></li>
+<li><a href="#what-st-cos-controls">What ST-COS controls</a></li>
+<li><a href="#package-and-source">Package and source</a></li>
+</ul>
+</div>
+
+<p class="lead-copy">
+ST-COS simulates spatial transcriptomics data with configurable spatial gene patterns, cell-type composition, negative-binomial marginals, and explicit latent gene-gene dependence.
+</p>
+<p><img class="workflow-image" src="assets/workflow.png" alt="ST-COS reference-free and reference-based workflows"></p>
+<div id="choose-a-workflow" class="section level2">
+<h2>Choose a workflow</h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Goal</th>
+<th>Start here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Design cell types, spatial patterns, and gene modules from scratch</td>
+<td><a href="Example.html">Reference-free tutorial</a></td>
+</tr>
+<tr class="even">
+<td>Fit a model to an observed spatial transcriptomics dataset</td>
+<td><a href="Data_code.html">Reference-based tutorial</a></td>
+</tr>
+<tr class="odd">
+<td>Install the package and check input dimensions</td>
+<td><a href="Rpackage.html">Installation and inputs</a></td>
+</tr>
+<tr class="even">
+<td>Understand latent correlation, count-scale attenuation, and spot mixing</td>
+<td><a href="Shiny_tutorial.html">Interpretation and limitations</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="what-st-cos-controls" class="section level2">
+<h2>What ST-COS controls</h2>
+<p>ST-COS separates five parts of a simulation:</p>
+<ol style="list-style-type: decimal">
+<li>Spatial coordinates and cell-type abundance fields.</li>
+<li>Cell-type-specific spatial mean expression.</li>
+<li>Gene-specific negative-binomial marginals.</li>
+<li>Latent Gaussian pairwise dependence among selected genes.</li>
+<li>Abundance-weighted construction of spot-level profiles.</li>
+</ol>
+<p>This separation lets users change one component while holding the others fixed, which is useful for controlled benchmark scenarios and counterfactual experiments.</p>
+<div class="note">
+<p>The specified correlation matrix is a latent Gaussian target. Pearson and Spearman correlations measured from the final counts can be smaller because of discretization, sparsity, and spot-level mixing.</p>
+</div>
+</div>
+<div id="package-and-source" class="section level2">
+<h2>Package and source</h2>
+<ul>
+<li><a href="https://github.com/Yiyannnnn/ST-COS">ST-COS package</a></li>
+<li><a href="https://github.com/Yiyannnnn/STCOS_tutorial">Tutorial source</a></li>
+<li><a href="https://github.com/Yiyannnnn/ST-COS/issues">Issue tracker</a></li>
+</ul>
 </div>
 
 
@@ -302,6 +393,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

@@ -11,12 +11,12 @@
 
 
 
-<title>Installation</title>
+<title>Installation and Inputs</title>
 
-<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -30,6 +30,9 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -40,12 +43,23 @@
   ul.task-list{list-style: none;}
     </style>
 
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
 
 
 
 
 
 
+<link rel="stylesheet" href="styles.css" type="text/css" />
 
 
 
@@ -204,6 +218,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -226,28 +243,33 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Simulator NAME?</a>
+      <a class="navbar-brand" href="index.html">ST-COS</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Main.html">About</a>
+  <a href="index.html">Overview</a>
 </li>
 <li>
-  <a href="Example.html">Example</a>
-</li>
-<li>
-  <a href="Shiny_tutorial.html">Shiny App</a>
-</li>
-<li>
-  <a href="Data_code.html">Reproduce</a>
+  <a href="Main.html">How it works</a>
 </li>
 <li>
   <a href="Rpackage.html">Installation</a>
 </li>
+<li>
+  <a href="Example.html">Reference-free</a>
+</li>
+<li>
+  <a href="Data_code.html">Reference-based</a>
+</li>
+<li>
+  <a href="Shiny_tutorial.html">Interpretation</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/Yiyannnnn/ST-COS">GitHub</a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -255,38 +277,164 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">Installation</h1>
-
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
 </div>
 
 
-<p>#Simulator Name# is implemented as an R package, which can be
-installed from GitHub by:</p>
-<div id="install-devtools-if-necessary" class="section level3">
-<h3>1. Install devtools if necessary</h3>
-<p><br />
-<br />
-<br />
-<br />
-</p>
+
+<h1 class="title toc-ignore">Installation and Inputs</h1>
+
 </div>
-<div id="install-simulator-name" class="section level3">
-<h3>2. Install #Simulator Name</h3>
-<p><br />
-<br />
-<br />
-<br />
-</p>
+
+<div id="TOC">
+<ul>
+<li><a href="#install-st-cos">Install ST-COS</a></li>
+<li><a href="#input-conventions">Input conventions</a></li>
+<li><a href="#main-functions">Main functions</a></li>
+<li><a href="#reviewed-defaults">Reviewed defaults</a></li>
+<li><a href="#quick-installation-check">Quick installation check</a></li>
+</ul>
 </div>
-<div id="load-package" class="section level3">
-<h3>3. Load package</h3>
-<p><br />
-<br />
-<br />
-<br />
-</p>
+
+<div id="install-st-cos" class="section level2">
+<h2>Install ST-COS</h2>
+<p>Install the development version directly from GitHub:</p>
+<pre class="r"><code>install.packages(&quot;devtools&quot;) # Skip if devtools is already installed
+devtools::install_github(&quot;Yiyannnnn/ST-COS&quot;)</code></pre>
+<p>Load the package and confirm the installed version:</p>
+<pre class="r"><code>library(STCOS)
+packageVersion(&quot;STCOS&quot;)</code></pre>
+<p>The package imports <code>data.table</code>, <code>expm</code>, <code>mgcv</code>, and <code>spdep</code>. Installing with <code>devtools::install_github()</code> installs missing CRAN dependencies automatically.</p>
+</div>
+<div id="input-conventions" class="section level2">
+<h2>Input conventions</h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Object</th>
+<th>Orientation and requirements</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reference count matrix</td>
+<td>Genes in rows and spots in columns; non-negative counts</td>
+</tr>
+<tr class="even">
+<td>Reference coordinates</td>
+<td>One row per spot with numeric columns named <code>row</code> and <code>col</code></td>
+</tr>
+<tr class="odd">
+<td>Reference-free coordinates</td>
+<td>One row per spot with columns <code>x_coord</code> and <code>y_coord</code></td>
+</tr>
+<tr class="even">
+<td><code>mean_param</code></td>
+<td>Named list of spot-by-gene matrices, one per cell type</td>
+</tr>
+<tr class="odd">
+<td><code>theta_g</code></td>
+<td>Named list containing one NB size per gene, or one shared value</td>
+</tr>
+<tr class="even">
+<td><code>celltype_proportion</code></td>
+<td>Spot-by-cell-type matrix; every row sums to one</td>
+</tr>
+<tr class="odd">
+<td><code>cov_gene</code></td>
+<td>Gene-by-gene matrix or array with one matrix per cell type</td>
+</tr>
+</tbody>
+</table>
+<p>Cell-type names must agree across <code>mean_param</code>, <code>theta_g</code>, <code>gene_relationship</code>, <code>cov_gene</code>, and the columns of <code>celltype_proportion</code>.</p>
+</div>
+<div id="main-functions" class="section level2">
+<h2>Main functions</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>generate_coordinates()</code></td>
+<td>Create grid, hexagonal, or random locations</td>
+</tr>
+<tr class="even">
+<td><code>generate_gene_pattern()</code></td>
+<td>Build cell-type-specific spatial mean matrices</td>
+</tr>
+<tr class="odd">
+<td><code>generate_covariance_group()</code></td>
+<td>Generate grouped dependence matrices</td>
+</tr>
+<tr class="even">
+<td><code>generate_true_count()</code></td>
+<td>Simulate cell-type-specific spot profiles</td>
+</tr>
+<tr class="odd">
+<td><code>generate_spot_count()</code></td>
+<td>Construct abundance-weighted spot profiles</td>
+</tr>
+<tr class="even">
+<td><code>generate_batch_count()</code></td>
+<td>Apply dropout and sequencing-depth effects</td>
+</tr>
+<tr class="odd">
+<td><code>get_real_param()</code></td>
+<td>Estimate reference-based parameters</td>
+</tr>
+</tbody>
+</table>
+<p>Use <code>?function_name</code> in R for argument-level documentation, for example:</p>
+<pre class="r"><code>?generate_true_count
+?get_real_param</code></pre>
+</div>
+<div id="reviewed-defaults" class="section level2">
+<h2>Reviewed defaults</h2>
+<p>The reference-based function exposes the sensitivity parameters used in the manuscript:</p>
+<pre class="r"><code>fitted &lt;- get_real_param(
+  expr,
+  spatial_coord,
+  rownames(expr),
+  moran_thr = 0.15,
+  cor_thr = 0.05,
+  eigen_floor = 1e-6,
+  neighbor_k = 6,
+  spline_k = 50,
+  dispersion_cap = 1e6,
+  n_cores = 4
+)</code></pre>
+<ul>
+<li><code>eigen_floor</code> is a numerical device; routine searching is not required.</li>
+<li><code>cor_thr</code> is substantive because it controls sparsification of the fitted dependence matrix.</li>
+<li><code>neighbor_k = 6</code> is the default used for the Visium analyses in the study, but it remains user-configurable for other spatial resolutions.</li>
+<li><code>dispersion_cap = Inf</code> requests the explicit Poisson limit when the estimated variance does not exceed the mean.</li>
+</ul>
+</div>
+<div id="quick-installation-check" class="section level2">
+<h2>Quick installation check</h2>
+<p>This small check should return a coordinate table with 25 rows:</p>
+<pre class="r"><code>coord &lt;- generate_coordinates(
+  x_len = 4,
+  y_len = 4,
+  pattern = &quot;grid&quot;,
+  spot_distance = 1
+)
+dim(coord)
+# [1] 25  2</code></pre>
+<p>Next: <a href="Example.html">run a reference-free simulation</a>.</p>
 </div>
 
 
@@ -322,6 +470,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
