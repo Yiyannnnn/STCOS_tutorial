@@ -262,6 +262,9 @@ $(document).ready(function () {
 <li>
   <a href="Data_code.html">Reference-based</a>
 </li>
+<li>
+  <a href="https://yiyanz.shinyapps.io/st-cos/">Image-guided app</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -291,6 +294,7 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#install-st-cos">Install ST-COS</a></li>
+<li><a href="#launch-the-image-guided-application">Launch the image-guided application</a></li>
 <li><a href="#input-conventions">Input conventions</a></li>
 <li><a href="#main-functions">Main functions</a></li>
 <li><a href="#reviewed-defaults">Reviewed defaults</a></li>
@@ -307,6 +311,13 @@ devtools::install_github(&quot;Yiyannnnn/ST-COS&quot;)</code></pre>
 <pre class="r"><code>library(STCOS)
 packageVersion(&quot;STCOS&quot;)</code></pre>
 <p>The package imports <code>data.table</code>, <code>expm</code>, <code>mgcv</code>, and <code>spdep</code>. Installing with <code>devtools::install_github()</code> installs missing CRAN dependencies automatically.</p>
+</div>
+<div id="launch-the-image-guided-application" class="section level2">
+<h2>Launch the image-guided application</h2>
+<p>The hosted Shiny application accepts histology images or coordinate files and provides interactive controls for spatial layout, regions, gene patterns, cell-type composition, and gene-dependence groups.</p>
+<pre class="r"><code>launch_stcos_app()</code></pre>
+<p>This opens <a href="https://yiyanz.shinyapps.io/st-cos/">the ST-COS image-guided app</a> in the default browser. From a remote or headless R session, return the URL without opening a browser:</p>
+<pre class="r"><code>launch_stcos_app(browser = FALSE)</code></pre>
 </div>
 <div id="input-conventions" class="section level2">
 <h2>Input conventions</h2>
@@ -391,6 +402,10 @@ packageVersion(&quot;STCOS&quot;)</code></pre>
 <tr class="odd">
 <td><code>get_real_param()</code></td>
 <td>Estimate reference-based parameters</td>
+</tr>
+<tr class="even">
+<td><code>launch_stcos_app()</code></td>
+<td>Open the hosted image-guided interface</td>
 </tr>
 </tbody>
 </table>

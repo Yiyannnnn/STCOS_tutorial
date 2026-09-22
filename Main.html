@@ -262,6 +262,9 @@ $(document).ready(function () {
 <li>
   <a href="Data_code.html">Reference-based</a>
 </li>
+<li>
+  <a href="https://yiyanz.shinyapps.io/st-cos/">Image-guided app</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -294,6 +297,7 @@ $(document).ready(function () {
 <li><a href="#two-simulation-modes">Two simulation modes</a>
 <ul>
 <li><a href="#reference-free">Reference-free</a></li>
+<li><a href="#image-guided-reference-free-design">Image-guided reference-free design</a></li>
 <li><a href="#reference-based">Reference-based</a></li>
 </ul></li>
 <li><a href="#output-orientation">Output orientation</a></li>
@@ -331,6 +335,10 @@ X_{jg} = \sum_c n_{jc}Y_{jg}^{(c)}, \qquad n_{jc}=N_jp_{jc},
 <li>one latent dependence matrix for each cell type.</li>
 </ul>
 <p>This mode is appropriate when a benchmark requires known truth or a deliberate change to a spatial or dependence parameter.</p>
+</div>
+<div id="image-guided-reference-free-design" class="section level3">
+<h3>Image-guided reference-free design</h3>
+<p>The <a href="https://yiyanz.shinyapps.io/st-cos/">ST-COS Shiny app</a> extends the reference-free workflow with histology-image upload and segmentation, externally supplied coordinates, and interactive spatial-region controls. It can also be opened from R with <code>launch_stcos_app()</code>.</p>
 </div>
 <div id="reference-based" class="section level3">
 <h3>Reference-based</h3>

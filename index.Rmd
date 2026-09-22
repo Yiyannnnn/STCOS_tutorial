@@ -17,6 +17,7 @@ latent gene-gene dependence.
 | --- | --- |
 | Design cell types, spatial patterns, and gene modules from scratch | [Reference-free tutorial](Example.html) |
 | Fit a model to an observed spatial transcriptomics dataset | [Reference-based tutorial](Data_code.html) |
+| Upload a histology image or coordinate file and design a simulation interactively | [Image-guided Shiny app](https://yiyanz.shinyapps.io/st-cos/) |
 | Install the package and check input dimensions | [Installation and inputs](Rpackage.html) |
 
 ## What ST-COS controls
@@ -42,5 +43,6 @@ of discretization, sparsity, and spot-level mixing.
 ## Package and source
 
 - [ST-COS package](https://github.com/Yiyannnnn/ST-COS)
+- [Image-guided Shiny app](https://yiyanz.shinyapps.io/st-cos/)
 - [Tutorial source](https://github.com/Yiyannnnn/STCOS_tutorial)
 - [Issue tracker](https://github.com/Yiyannnnn/ST-COS/issues)

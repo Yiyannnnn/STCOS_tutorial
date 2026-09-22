@@ -13,6 +13,8 @@ navbar:
       href: Example.html
     - text: "Reference-based"
       href: Data_code.html
+    - text: "Image-guided app"
+      href: https://yiyanz.shinyapps.io/st-cos/
   right:
     - text: "GitHub"
       href: https://github.com/Yiyannnnn/ST-COS

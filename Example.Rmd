@@ -19,6 +19,13 @@ and 492 hexagonally arranged spots. It combines hotspots, streaks, layers,
 cell-type-specific gene modules, and spatially varying cell-type composition.
 Only ST-COS and base R are required.
 
+<div class="note">
+For image-derived layouts, open the
+<a href="https://yiyanz.shinyapps.io/st-cos/">image-guided Shiny app</a>
+directly or run <code>launch_stcos_app()</code> from R. The app accepts a
+histology image, an externally segmented mask, or an uploaded coordinate file.
+</div>
+
 ## 1. Define genes and spatial patterns
 
 The first 50 genes carry designed spatial signal and the remaining 100 genes

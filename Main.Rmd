@@ -49,6 +49,13 @@ The user supplies or generates:
 This mode is appropriate when a benchmark requires known truth or a deliberate
 change to a spatial or dependence parameter.
 
+### Image-guided reference-free design
+
+The [ST-COS Shiny app](https://yiyanz.shinyapps.io/st-cos/) extends the
+reference-free workflow with histology-image upload and segmentation,
+externally supplied coordinates, and interactive spatial-region controls. It
+can also be opened from R with `launch_stcos_app()`.
+
 ### Reference-based
 
 `get_real_param()` estimates:
